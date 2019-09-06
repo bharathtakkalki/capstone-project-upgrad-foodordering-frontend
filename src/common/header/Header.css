@@ -6,3 +6,18 @@
     padding: 10px;
     align-items: center;
 }
+
+.header-searchbox{
+    display: flex;
+    /* align-self: center; */
+    align-items: center;
+    /* justify-content: center; */
+    width: 300px;
+    align-self: flex-start;
+    height: 40px;
+}
+
+#search-icon{
+    height: 27px;
+    padding: 0px 0px 0px 10px;
+}
