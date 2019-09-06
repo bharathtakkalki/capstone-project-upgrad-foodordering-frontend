@@ -41,3 +41,22 @@
 .login-button-icon{
     padding-right: 10px;
 }
+
+.login-modal-tabs {
+    margin-bottom: 20px;
+}
+
+.dispNone {
+    display: none;
+}
+
+.dispBlock {
+    display: block;
+}
+
+.input-fields{
+    width:250px;
+}
+.red {
+    color: red;
+}
