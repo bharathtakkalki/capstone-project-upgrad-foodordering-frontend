@@ -33,7 +33,7 @@ class Header extends Component{
         const {classes} = this.props;
         return(
             <header className = "app-header">
-                <FastfoodIcon fontSize="large" htmlColor="white"/>
+                <FastfoodIcon className="app-logo" fontSize="large" htmlColor="white"/>
                 <span className="header-searchbox">
                         <Input className={classes.searchText}
                              startAdornment={
