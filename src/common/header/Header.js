@@ -78,11 +78,12 @@ class Header extends Component {
             lastName: "",
             email: "",
             emailRequired: "dispNone",
+            invalidEmail:"dispNone",
             signUpPassword: "",
             signUpPasswordRequired: "dispNone",
             signUpContactNo: "",
             signUpContactNoRequired: "dispNone",
-            inValidContact: "dispNone",
+            inValidLoginContact: "dispNone",
             invalidPassword: "dispNone",
             notRegisteredContact: "dispNone",
             validPasswordHelpText: "dispNone",
@@ -119,11 +120,12 @@ class Header extends Component {
             lastName: "",
             email: "",
             emailRequired: "dispNone",
+            invalidEmail:"dispNone",
             signUpPassword: "",
             signUpPasswordRequired: "dispNone",
             signUpContactNo: "",
             signUpContactNoRequired: "dispNone",
-            inValidContact: "dispNone",
+            inValidLoginContact: "dispNone",
             invalidPassword: "dispNone",
             notRegisteredContact: "dispNone",
             validPasswordHelpText: "dispNone",
@@ -237,7 +239,7 @@ class Header extends Component {
     handleLoginFormValidation = () => {
         let loginContactNoRequired = "dispNone";
         let loginPasswordRequired = "dispNone";
-        let inValidContact = "dispNone";
+        let inValidLoginContact = "dispNone";
         let isFormValid = true;
         if (this.state.loginContactNo === "") {
             loginContactNoRequired = "dispBlock";
@@ -250,270 +252,316 @@ class Header extends Component {
         if (this.state.loginContactNo !== "") {
             var contactNo = "[7-9][0-9]{9}";
             if (!this.state.loginContactNo.match(contactNo)) {
-                inValidContact = "dispBlock"
+                inValidLoginContact = "dispBlock"
                 isFormValid = false;
             }
         }
         this.setState({
             loginContactNoRequired: loginContactNoRequired,
             loginPasswordRequired: loginPasswordRequired,
-            inValidContact: inValidContact
+            inValidLoginContact: inValidLoginContact
         })
         return (isFormValid);
     }
 
     signUpClickHandler = () => {
         if (this.signUpFormValidation()) {
+            let dataSignUp = JSON.stringify({
+                "contact_number": this.state.signUpContactNo,
+                "email_address": this.state.email,
+                "first_name": this.state.firstName,
+                "last_name": this.state.lastName,
+                "password": this.state.signUpPassword
+            });
+
+            let xhrSignUp = new XMLHttpRequest();
+            let that = this;
+            xhrSignUp.addEventListener("readystatechange", function () {
+                if (this.readyState === 4) {
+                    if (xhrSignUp.status === 201) {
+                        that.setState({
+                            ...that.state,
+                            value: 0,
+                            snackBarMessage: "Registered successfully! Please login now!",
+                            snackBarOpen: true,
+                        })
+                    }
+                    if(xhrSignUp.status === 400){
+                        let responseData = JSON.parse(this.responseText)
+                        if(responseData.code === 'SGR-001'){
+                            that.setState({
+                                ...that.state,
+                                contactNoRegistered:"dispBlock"
+                            })
+                        }
+                    }
+                }
+            });
+            xhrSignUp.open("POST",this.props.baseUrl+"customer/signup");
+            xhrSignUp.setRequestHeader("Content-Type","application/json");
+            xhrSignUp.setRequestHeader("Cache-Control","no-cache");
+            xhrSignUp.send(dataSignUp);
         }
-
-        // this.setState({
-        //     ...this.state,
-        //     value: 0,
-        //     snackBarMessage: "Registered successfully! Please login now!",
-        //     snackBarOpen: true,
-        // })
-
     }
 
-    signUpFormValidation = () => {
-        console.log("here")
-        let firstNameRequired = "dispNone";
-        let emailRequired = "dispNone";
-        let signUpPasswordRequired = "dispNone";
-        let signUpContactNoRequired = "dispNone";
-        let validPasswordHelpText = "dispNone";
-        let signUpFormValid = true;
+        signUpFormValidation = () => {
+            let firstNameRequired = "dispNone";
+            let emailRequired = "dispNone";
+            let signUpPasswordRequired = "dispNone";
+            let signUpContactNoRequired = "dispNone";
+            let validPasswordHelpText = "dispNone";
+            let contactHelpText = "dispNone";
+            let invalidEmail = "dispNone";
+            let signUpFormValid = true;
 
-        if (this.state.firstName === "") {
-            firstNameRequired = "dispBlock";
-            signUpFormValid = false;
-        }
-        if (this.state.email === "") {
-            emailRequired = "dispBlock";
-            signUpFormValid = false;
-        }
-        if (this.state.signUpContactNo === "") {
-            signUpContactNoRequired = "dispBlock";
-            signUpFormValid = false;
-        }
-        if (this.state.signUpPassword === "") {
-            signUpPasswordRequired = "dispBlock";
-            signUpFormValid = false;
-        }
-        if (this.state.signUpPassword !== "") {
-            console.log(this.state.signUpPassword.length)
-            if (!this.isValidPassword(this.state.signUpPassword)) {
-                validPasswordHelpText = "dispBlock"
+            if (this.state.firstName === "") {
+                firstNameRequired = "dispBlock";
                 signUpFormValid = false;
-
             }
+            if (this.state.email === "") {
+                emailRequired = "dispBlock";
+                signUpFormValid = false;
+            }
+            if (this.state.email !== "") {
+  
+                if (!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w+)+$/.test(this.state.email))) {
+                    invalidEmail = "dispBlock"
+                    signUpFormValid = false;
+                }
+            }
+            if (this.state.signUpContactNo === "") {
+                signUpContactNoRequired = "dispBlock";
+                signUpFormValid = false;
+            }
+            if (this.state.signUpContactNo !== "") {
+                var contactNo = "[7-9][0-9]{9}";
+                if (!this.state.signUpContactNo.match(contactNo)) {
+                    contactHelpText = "dispBlock"
+                    signUpFormValid = false;
+                }
+            }
+            if (this.state.signUpPassword === "") {
+                signUpPasswordRequired = "dispBlock";
+                signUpFormValid = false;
+            }
+            if (this.state.signUpPassword !== "") {
+                if (!this.isValidPassword(this.state.signUpPassword)) {
+                    validPasswordHelpText = "dispBlock"
+                    signUpFormValid = false;
+
+                }
+            }
+            this.setState({
+                firstNameRequired: firstNameRequired,
+                emailRequired: emailRequired,
+                contactHelpText:contactHelpText,
+                signUpPasswordRequired: signUpPasswordRequired,
+                signUpContactNoRequired: signUpContactNoRequired,
+                invalidEmail:invalidEmail,
+                validPasswordHelpText: validPasswordHelpText,
+            })
+            return (signUpFormValid);
+
         }
-        this.setState({
-            firstNameRequired: firstNameRequired,
-            emailRequired: emailRequired,
-            signUpPasswordRequired: signUpPasswordRequired,
-            signUpContactNoRequired: signUpContactNoRequired,
-            validPasswordHelpText: validPasswordHelpText,
-        })
-        return (signUpFormValid);
 
-    }
-
-    isValidPassword = (password) => {
-        let lowerCase = false;
-        let upperCase = false;
-        let number = false;
-        let specialCharacter = false;
+        isValidPassword = (password) => {
+            let lowerCase = false;
+            let upperCase = false;
+            let number = false;
+            let specialCharacter = false;
 
 
-        if (password.length < 8) {
+            if (password.length < 8) {
+                return false;
+            }
+
+            if (password.match("(?=.*[0-9]).*")) {
+                number = true;
+            }
+
+            if (password.match("(?=.*[a-z]).*")) {
+                lowerCase = true;
+            }
+            if (password.match("(?=.*[A-Z]).*")) {
+                upperCase = true;
+            }
+            if (password.match("(?=.*[#@$%&*!^]).*")) {
+                specialCharacter = true;
+            }
+
+            if (lowerCase && upperCase) {
+                if (specialCharacter && number) {
+                    return true;
+                }
+            } else {
+                return false;
+            }
             return false;
         }
 
-        if (password.match("(?=.*[0-9]).*")) {
-            number = true;
-        }
-
-        if (password.match("(?=.*[a-z]).*")) {
-            lowerCase = true;
-        }
-        if (password.match("(?=.*[A-Z]).*")) {
-            upperCase = true;
-        }
-        if (password.match("(?=.*[#@$%&*!^]).*")) {
-            specialCharacter = true;
-        }
-
-        if (lowerCase && upperCase) {
-            if (specialCharacter && number) {
-                return true;
+        snackBarClose = (event, reason) => {
+            if (reason === 'clickaway') {
+                return;
             }
-        } else {
-            return false;
+            this.setState({
+                ...this.state,
+                snackBarMessage: "",
+                snackBarOpen: false,
+            })
         }
-        return false;
-    }
 
-    snackBarClose = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-        this.setState({
-            ...this.state,
-            snackBarMessage: "",
-            snackBarOpen: false,
-        })
-    }
-
-    render() {
-        const { classes } = this.props;
-        return (
-            <div>
-                {/* {this.state.loggedIn === false && this.state.loginCredentialsCorrect === true ? this.callLoginAPI():""}  */}
-                <header className="app-header">
-                    <FastfoodIcon className="app-logo" fontSize="large" htmlColor="white" />
-                    <span className="header-searchbox">
-                        <Input className={classes.searchText}
-                            startAdornment={
-                                <InputAdornment position="start">
-                                    <SearchIcon id="search-icon" htmlColor="white"></SearchIcon>
-                                </InputAdornment>
-                            }
-                            fullWidth={true} placeholder="Search by Restaurant Name" />
-                    </span>
-                    <Button className={classes.loginButton} size="large" variant="contained" onClick={this.loginButtonClickHandler}>
-                        <AccountCircle className="login-button-icon" />
-                        LOGIN
-                </Button>
-                </header>
-                <Modal
-                    ariaHideApp={false}
-                    isOpen={this.state.isModalOpen}
-                    contentLabel="Login"
-                    onRequestClose={this.closeModalHandler}
-                    style={customStyles}
-                >
-                    <Tabs className="login-modal-tabs" value={this.state.value} onChange={this.tabsChangeHandler}>
-                        <Tab label="LOGIN" className={classes.tab} />
-                        <Tab label="SIGNUP" className={classes.tab} />
-                    </Tabs>
-
-                    {this.state.value === 0 &&
-                        <TabContainer>
-                            <FormControl required className={classes.formControl}>
-                                <InputLabel htmlFor="login-contact-no">Contact No.</InputLabel>
-                                <Input id="login-contact-no" className="input-fields" fullWidth={true} type="text" logincontactno={this.state.loginContactNo} onChange={this.inputLoginContactNoChangeHandler} value={this.state.loginContactNo} />
-                                <FormHelperText className={this.state.loginContactNoRequired}>
-                                    <span className='red'>required</span>
-                                </FormHelperText>
-                                <FormHelperText className={this.state.inValidContact}>
-                                    <span className="red">Invalid Contact</span>
-                                </FormHelperText>
-
-                            </FormControl>
-                            <br />
-                            <br />
-                            <FormControl required className={classes.formControl}>
-                                <InputLabel htmlFor="login-password">Password</InputLabel>
-                                <Input id="login-password" className="input-fields" type="password" loginpassword={this.state.loginPassword} fullWidth={true} onChange={this.inputLoginPasswordChangeHandler} value={this.state.loginPassword} />
-                                <FormHelperText className={this.state.loginPasswordRequired}>
-                                    <span className='red'>required</span>
-                                </FormHelperText>
-                                <FormHelperText className={this.state.invalidPassword}>
-                                    <span className="red">Invalid Credentials</span>
-                                </FormHelperText>
-                                <FormHelperText className={this.state.notRegisteredContact}>
-                                    <span className="red">This contact number has not been registered!</span>
-                                </FormHelperText>
-                            </FormControl>
-                            <br />
-                            <br />
-                            <br />
-                            <Button variant="contained" className={classes.formButton} color="primary" onClick={this.loginClickHandler}>LOGIN</Button>
-                        </TabContainer>
-                    }
-                    {this.state.value === 1 &&
-                        <TabContainer>
-                            <FormControl required className={classes.formControl}>
-                                <InputLabel htmlFor="first-name">First Name</InputLabel>
-                                <Input id="first-name" className="input-fields" firstname={this.state.firstName} fullWidth={true} onChange={this.inputFirstNameChangeHandler} value={this.state.firstName} />
-                                <FormHelperText className={this.state.firstNameRequired}>
-                                    <span className="red">required</span>
-                                </FormHelperText>
-                            </FormControl>
-                            <br />
-                            <br />
-                            <FormControl className={classes.formControl}>
-                                <InputLabel htmlFor="last-name">Last Name</InputLabel>
-                                <Input id="last-name" className="input-fields" lastname={this.state.lastName} fullWidth={true} onChange={this.inputLastNameChangeHandler} value={this.state.lastName} />
-                            </FormControl>
-                            <br />
-                            <br />
-                            <FormControl required className={classes.formControl}>
-                                <InputLabel htmlFor="email">Email</InputLabel>
-                                <Input id="email" className="input-fields" type="email" email={this.state.email} fullWidth={true} onChange={this.inputEmailChangeHandler} value={this.state.email} />
-                                <FormHelperText className={this.state.emailRequired}>
-                                    <span className="red">required</span>
-                                </FormHelperText>
-                            </FormControl>
-                            <br />
-                            <br />
-                            <FormControl required className={classes.formControl}>
-                                <InputLabel htmlFor="sign-up-password">Password</InputLabel>
-                                <Input id="sign-up-password" className="input-fields" type="password" signuppassword={this.state.signUpPassword} fullWidth={true} onChange={this.inputSignUpPasswordChangeHandler} value={this.state.signUpPassword} />
-                                <FormHelperText className={this.state.signUpPasswordRequired}>
-                                    <span className="red">required</span>
-                                </FormHelperText>
-                                <FormHelperText className={this.state.validPasswordHelpText}>
-                                    <span className="red">Password must contain at least one capital letter, one small letter, one number, and one special character</span>
-                                </FormHelperText>
-                            </FormControl>
-                            <br />
-                            <br />
-                            <FormControl required className={classes.formControl}>
-                                <InputLabel htmlFor="sign-up-contactNo">Contact No.</InputLabel>
-                                <Input id="sign-up-contactNo" className="input-fields" signupcontactno={this.state.signUpContactNo} fullWidth={true} onChange={this.inputSignUpContactNoChangeHandler} value={this.state.signUpContactNo} />
-                                <FormHelperText className={this.state.signUpContactNoRequired}>
-                                    <span className="red">required</span>
-                                </FormHelperText>
-                                <FormHelperText className={this.state.contactHelpText}>
-                                    <span className="red">Contact No. must contain only numbers and must be 10 digits long</span>
-                                </FormHelperText>
-                                <FormHelperText className={this.state.contactNoRegistered}>
-                                    <span className="red">This contact number is already registered! Try other contact number.</span>
-                                </FormHelperText>
-                            </FormControl>
-                            <br />
-                            <br />
-                            <br />
-                            <Button variant="contained" className={classes.formButton} color="primary" onClick={this.signUpClickHandler}>SIGNUP</Button>
-                        </TabContainer>
-                    }
-                </Modal>
+        render() {
+            const { classes } = this.props;
+            return (
                 <div>
-                    <Snackbar
-                        anchorOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'left',
-                        }}
-                        open={this.state.snackBarOpen}
-                        autoHideDuration={4000}
-                        onClose={this.snackBarClose}
-                        TransitionComponent={this.state.transition}
-                        ContentProps={{
-                            'aria-describedby': 'message-id',
-                        }}
-                        message={<span id="message-id">{this.state.snackBarMessage}</span>}
-                    />
+                    {/* {this.state.loggedIn === false && this.state.loginCredentialsCorrect === true ? this.callLoginAPI():""}  */}
+                    <header className="app-header">
+                        <FastfoodIcon className="app-logo" fontSize="large" htmlColor="white" />
+                        <span className="header-searchbox">
+                            <Input className={classes.searchText}
+                                startAdornment={
+                                    <InputAdornment position="start">
+                                        <SearchIcon id="search-icon" htmlColor="white"></SearchIcon>
+                                    </InputAdornment>
+                                }
+                                fullWidth={true} placeholder="Search by Restaurant Name" />
+                        </span>
+                        <Button className={classes.loginButton} size="large" variant="contained" onClick={this.loginButtonClickHandler}>
+                            <AccountCircle className="login-button-icon" />
+                            LOGIN
+                </Button>
+                    </header>
+                    <Modal
+                        ariaHideApp={false}
+                        isOpen={this.state.isModalOpen}
+                        contentLabel="Login"
+                        onRequestClose={this.closeModalHandler}
+                        style={customStyles}
+                    >
+                        <Tabs className="login-modal-tabs" value={this.state.value} onChange={this.tabsChangeHandler}>
+                            <Tab label="LOGIN" className={classes.tab} />
+                            <Tab label="SIGNUP" className={classes.tab} />
+                        </Tabs>
+
+                        {this.state.value === 0 &&
+                            <TabContainer>
+                                <FormControl required className={classes.formControl}>
+                                    <InputLabel htmlFor="login-contact-no">Contact No.</InputLabel>
+                                    <Input id="login-contact-no" className="input-fields" fullWidth={true} type="text" logincontactno={this.state.loginContactNo} onChange={this.inputLoginContactNoChangeHandler} value={this.state.loginContactNo} />
+                                    <FormHelperText className={this.state.loginContactNoRequired}>
+                                        <span className='red'>required</span>
+                                    </FormHelperText>
+                                    <FormHelperText className={this.state.inValidLoginContact}>
+                                        <span className="red">Invalid Contact</span>
+                                    </FormHelperText>
+
+                                </FormControl>
+                                <br />
+                                <br />
+                                <FormControl required className={classes.formControl}>
+                                    <InputLabel htmlFor="login-password">Password</InputLabel>
+                                    <Input id="login-password" className="input-fields" type="password" loginpassword={this.state.loginPassword} fullWidth={true} onChange={this.inputLoginPasswordChangeHandler} value={this.state.loginPassword} />
+                                    <FormHelperText className={this.state.loginPasswordRequired}>
+                                        <span className='red'>required</span>
+                                    </FormHelperText>
+                                    <FormHelperText className={this.state.invalidPassword}>
+                                        <span className="red">Invalid Credentials</span>
+                                    </FormHelperText>
+                                    <FormHelperText className={this.state.notRegisteredContact}>
+                                        <span className="red">This contact number has not been registered!</span>
+                                    </FormHelperText>
+                                </FormControl>
+                                <br />
+                                <br />
+                                <br />
+                                <Button variant="contained" className={classes.formButton} color="primary" onClick={this.loginClickHandler}>LOGIN</Button>
+                            </TabContainer>
+                        }
+                        {this.state.value === 1 &&
+                            <TabContainer>
+                                <FormControl required className={classes.formControl}>
+                                    <InputLabel htmlFor="first-name">First Name</InputLabel>
+                                    <Input id="first-name" className="input-fields" firstname={this.state.firstName} fullWidth={true} onChange={this.inputFirstNameChangeHandler} value={this.state.firstName} />
+                                    <FormHelperText className={this.state.firstNameRequired}>
+                                        <span className="red">required</span>
+                                    </FormHelperText>
+                                </FormControl>
+                                <br />
+                                <br />
+                                <FormControl className={classes.formControl}>
+                                    <InputLabel htmlFor="last-name">Last Name</InputLabel>
+                                    <Input id="last-name" className="input-fields" lastname={this.state.lastName} fullWidth={true} onChange={this.inputLastNameChangeHandler} value={this.state.lastName} />
+                                </FormControl>
+                                <br />
+                                <br />
+                                <FormControl required className={classes.formControl}>
+                                    <InputLabel htmlFor="email">Email</InputLabel>
+                                    <Input id="email" className="input-fields" type="email" email={this.state.email} fullWidth={true} onChange={this.inputEmailChangeHandler} value={this.state.email} />
+                                    <FormHelperText className={this.state.emailRequired}>
+                                        <span className="red">required</span>
+                                    </FormHelperText>
+                                    <FormHelperText className={this.state.invalidEmail}>
+                                        <span className="red">Invalid Email</span>
+                                    </FormHelperText>
+                                </FormControl>
+                                <br />
+                                <br />
+                                <FormControl required className={classes.formControl}>
+                                    <InputLabel htmlFor="sign-up-password">Password</InputLabel>
+                                    <Input id="sign-up-password" className="input-fields" type="password" signuppassword={this.state.signUpPassword} fullWidth={true} onChange={this.inputSignUpPasswordChangeHandler} value={this.state.signUpPassword} />
+                                    <FormHelperText className={this.state.signUpPasswordRequired}>
+                                        <span className="red">required</span>
+                                    </FormHelperText>
+                                    <FormHelperText className={this.state.validPasswordHelpText}>
+                                        <span className="red">Password must contain at least one capital letter, one small letter, one number, and one special character</span>
+                                    </FormHelperText>
+                                </FormControl>
+                                <br />
+                                <br />
+                                <FormControl required className={classes.formControl}>
+                                    <InputLabel htmlFor="sign-up-contactNo">Contact No.</InputLabel>
+                                    <Input id="sign-up-contactNo" className="input-fields" signupcontactno={this.state.signUpContactNo} fullWidth={true} onChange={this.inputSignUpContactNoChangeHandler} value={this.state.signUpContactNo} />
+                                    <FormHelperText className={this.state.signUpContactNoRequired}>
+                                        <span className="red">required</span>
+                                    </FormHelperText>
+                                    <FormHelperText className={this.state.contactHelpText}>
+                                        <span className="red">Contact No. must contain only numbers and must be 10 digits long</span>
+                                    </FormHelperText>
+                                    <FormHelperText className={this.state.contactNoRegistered}>
+                                        <span className="red">This contact number is already registered! Try other contact number.</span>
+                                    </FormHelperText>
+                                </FormControl>
+                                <br />
+                                <br />
+                                <br />
+                                <Button variant="contained" className={classes.formButton} color="primary" onClick={this.signUpClickHandler}>SIGNUP</Button>
+                            </TabContainer>
+                        }
+                    </Modal>
+                    <div>
+                        <Snackbar
+                            anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'left',
+                            }}
+                            open={this.state.snackBarOpen}
+                            autoHideDuration={4000}
+                            onClose={this.snackBarClose}
+                            TransitionComponent={this.state.transition}
+                            ContentProps={{
+                                'aria-describedby': 'message-id',
+                            }}
+                            message={<span id="message-id">{this.state.snackBarMessage}</span>}
+                        />
+                    </div>
+
                 </div>
 
-            </div>
+            )
+        }
 
-        )
+
+
     }
 
-
-
-}
-
-export default withStyles(styles)(Header);  
+    export default withStyles(styles)(Header);  
