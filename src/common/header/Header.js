@@ -18,6 +18,7 @@ import Fade from '@material-ui/core/Fade';
 
 import './Header.css';
 import { FormControl, InputLabel, FormHelperText } from '@material-ui/core';
+import { tsNonNullExpression } from '@babel/types';
 
 const styles = (theme => ({
     searchText: {
@@ -37,7 +38,13 @@ const styles = (theme => ({
     },
     formControl: {
         "width": "80%",
+    },
+    profileButton:{
+        color:"#c2c2c2",
+        "text-transform":"none",
+        "font-weight": 400,
     }
+
 
 }))
 const customStyles = {
@@ -73,7 +80,7 @@ class Header extends Component {
             loginContactNoRequired: "dispNone",
             loginPassword: "",
             loginPasswordRequired: "dispNone",
-            firstName: "",
+            firstName: "bharath",
             firstNameRequired: "dispNone",
             lastName: "",
             email: "",
@@ -200,11 +207,13 @@ class Header extends Component {
             xhrLogin.addEventListener("readystatechange", function () {
                 if (this.readyState === 4) {
                     if (xhrLogin.status === 200) {
+                        let loginResponse = JSON.parse(this.responseText);
                         sessionStorage.setItem("uuid", JSON.parse(this.responseText).id);
                         sessionStorage.setItem("access-token", xhrLogin.getResponseHeader("access-token"));
                         that.setState({
                             ...that.state,
                             loggedIn: true,
+                            firstName:loginResponse.first_name,
                             snackBarMessage: "Logged in successfully!",
                             snackBarOpen: true,
                         })
@@ -414,7 +423,6 @@ class Header extends Component {
             const { classes } = this.props;
             return (
                 <div>
-                    {/* {this.state.loggedIn === false && this.state.loginCredentialsCorrect === true ? this.callLoginAPI():""}  */}
                     <header className="app-header">
                         <FastfoodIcon className="app-logo" fontSize="large" htmlColor="white" />
                         <span className="header-searchbox">
@@ -426,10 +434,16 @@ class Header extends Component {
                                 }
                                 fullWidth={true} placeholder="Search by Restaurant Name" />
                         </span>
+                        {this.state.loggedIn !== true ?
                         <Button className={classes.loginButton} size="large" variant="contained" onClick={this.loginButtonClickHandler}>
                             <AccountCircle className="login-button-icon" />
                             LOGIN
-                </Button>
+                        </Button>
+                        :<Button className={classes.profileButton} size="large" variant="text" onClick={this.profileButtonClickHandler}>
+                            <AccountCircle className="profile-button-icon" htmlColor="#c2c2c2"/>
+                            {this.state.firstName}
+                        </Button>
+                        }
                     </header>
                     <Modal
                         ariaHideApp={false}
