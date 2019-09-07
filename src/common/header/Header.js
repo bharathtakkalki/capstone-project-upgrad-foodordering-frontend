@@ -88,15 +88,16 @@ class Header extends Component {
             validPasswordHelpText: "dispNone",
             contactNoRegistered: "dispNone",
             contactHelpText: "dispNone",
-            snackBarOpen:false,
-            snackBarMessage:"",
-            transition:Fade,
+            snackBarOpen: false,
+            snackBarMessage: "",
+            transition: Fade,
+            loggedIn: false,
 
         }
 
     }
-   
-    
+
+
 
     closeModalHandler = () => {
         this.setState({
@@ -155,7 +156,6 @@ class Header extends Component {
         this.setState({
             ...this.state,
             signUpPassword: event.target.value,
-            validPasswordHelpText: "dispBlock"
         })
     }
     inputSignUpContactNoChangeHandler = (event) => {
@@ -171,37 +171,65 @@ class Header extends Component {
     }
 
     loginClickHandler = () => {
+        this.state.loginContactNo === "" ? this.setState({ loginContactNoRequired: "dispBlock" }) : this.setState({ loginContactNoRequired: "dispNone" });
+        this.state.loginPassword === "" ? this.setState({ loginPasswordRequired: "dispBlock" }) : this.setState({ loginPasswordRequired: "dispNone" });
+
+        if (this.state.loginContactNo !== "") {
+            var contactNo = "[7-9][0-9]{9}";
+            this.state.loginContactNo.match(contactNo) ? this.setState({ inValidContact: "dispNone" }) : this.setState({ inValidContact: "dispBlock" });
+        }
+        if (this.state.inValidContact === "dispNone" && this.state.loginPassword !== "") {
+            let dataLogin = null;
+            let xhrLogin = new XMLHttpRequest();
+            let that = this;
+            xhrLogin.addEventListener("readystatechange", function () {
+                if (this.readyState === 4 ) {
+                    var parseData = JSON.parse(this.responseText)
+                    console.log(xhrLogin.status)
+                    console.log(parseData);
+                    sessionStorage.setItem("uuid", JSON.parse(this.responseText).id);
+                    sessionStorage.setItem("access-token", xhrLogin.getResponseHeader("access-token"));
+                    console.log(xhrLogin.getResponseHeader("access-token"))
+
+                    that.setState({
+                        ...this.state,
+                        snackBarMessage: "Logged in successfully!",
+                        snackBarOpen: true,
+                    })
+                    that.closeModalHandler();
+                }
+            })
+            xhrLogin.open("POST", this.props.baseUrl + "customer/login");
+            xhrLogin.setRequestHeader("Authorization", "Basic " + window.btoa(this.state.loginContactNo + ":" + this.state.loginPassword));
+            xhrLogin.setRequestHeader("Content-Type", "application/json");
+            xhrLogin.setRequestHeader("Cache-Control", "no-cache");
+            xhrLogin.send(dataLogin);
+        }
+    }
+
+    signUpClickHandler = () => {
 
         this.setState({
             ...this.state,
-            snackBarMessage:"Logged in successfully!",
-            snackBarOpen:true,
-        })
-    }
-
-    signUpClickHandler= () => {
-
-        this.setState({
-            ...this.state,
-            value:0,
-            snackBarMessage:"Registered successfully! Please login now!",
-            snackBarOpen:true,
+            value: 0,
+            snackBarMessage: "Registered successfully! Please login now!",
+            snackBarOpen: true,
         })
 
     }
 
-  
-    
+
+
     snackBarClose = (event, reason) => {
         if (reason === 'clickaway') {
-          return;
+            return;
         }
         this.setState({
             ...this.state,
-            snackBarMessage:"",
-            snackBarOpen:false,
+            snackBarMessage: "",
+            snackBarOpen: false,
         })
-      }
+    }
 
     render() {
         const { classes } = this.props;

@@ -6,12 +6,16 @@ import Home from './home/Home';
 
 
 class Controller extends Component{
+    constructor(){
+        super()
+        this.baseUrl = "http://localhost:8080/api/"
+    }
 
     render(){
         return(
             <Router>
                 <div className = 'main-conatiner'>
-                    <Route exact path = '/' render={(props) => <Home {...props} />}/>
+                    <Route exact path = '/' render={(props) => <Home {...props} baseUrl = {this.baseUrl}/>}/>
                 </div>
             </Router>
 
