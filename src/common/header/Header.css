@@ -60,3 +60,11 @@
 .red {
     color: red;
 }
+
+/* style for the menu when clicked on profile_picture */
+#profile-menu{
+    margin-top: 30px;
+    padding: 0px;
+    margin-left: 20px;
+}
+
