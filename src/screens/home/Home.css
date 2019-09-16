@@ -5,3 +5,35 @@
     flex-direction: column;
     flex-flow: wrap;
 }
+
+.rest-rating{
+    background-color: rgb(234, 204, 94);
+    width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    height: 30px;
+    color: white;
+ 
+}
+.card-bottom-info{
+    display: flex;
+    justify-content: space-between;
+    height: 30px;
+    align-items: center;
+}
+
+.rest-for-two{
+    display: flex;
+    align-items: center;
+    width: 100px;
+    justify-content: space-around;
+}
+
+.title{
+    font-size:30px;
+}
+
+.MuiTypography-h5 {
+    font-size:45px;
+}
