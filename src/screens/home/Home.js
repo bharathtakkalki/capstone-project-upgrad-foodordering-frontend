@@ -43,12 +43,12 @@ const styles = (theme => ({
     },
 
     card:{
-        height:"400px",
-        '@media (min-width: 1200px)':{
+        height:"500px",
+        '@media (min-width: 1300px)':{
             height:"500px",
         },
-        '@media (min-width: 960px) and (max-width:1200px)':{
-            height:"400px",
+        '@media (min-width: 960px) and (max-width:1300px)':{
+            height:"375px",
         }
     },
 
@@ -60,8 +60,27 @@ const styles = (theme => ({
 
     title:{
         "font-size":"25px",
-        '@media (min-width: 1200px)':{
+        '@media (min-width: 1300px)':{
             "font-size":"40px",
+        },
+        '@media (min-width: 960px) and (max-width:1300px)':{
+            "font-size":"30px",
+        },
+        '@media (max-width: 960px)':{
+            "font-size":"40px",
+        }
+    },
+
+    categories:{
+        "font-size":"16px",
+        '@media (min-width: 1300px)':{
+            "font-size":"22px",
+        },
+        '@media (min-width: 960px) and (max-width:1300px)':{
+            "font-size":"20px",
+        },
+        '@media (max-width: 960px)':{
+            "font-size":"22px",
         }
     },
 
@@ -112,6 +131,11 @@ class Home extends Component {
         xhrRestaurant.send(data)
     }
 
+
+    restaurantCardClicked = (restaurantId) => {
+        this.props.history.push('/restaurant/'+restaurantId);
+    }
+
     render() {
         const { classes } = this.props;
         return (
@@ -123,7 +147,7 @@ class Home extends Component {
                         {this.state.restaurant.map(restaurant => (
                         <Grid key={restaurant.id} item xs={12} sm={6} md={3} className={classes.gridCard}>
                             <Card className={classes.card}>
-                                <CardActionArea className={classes.cardActionArea}>
+                                <CardActionArea className={classes.cardActionArea} onClick={() => this.restaurantCardClicked(restaurant.id)}>
                                     <CardMedia
                                         className={classes.media}
                                         image={restaurant.photo_URL}
@@ -135,7 +159,7 @@ class Home extends Component {
                                          </Typography>
                                     </CardContent>
                                     <CardContent className = {classes.cardContent}>
-                                        <Typography variant="subtitle1" component="p">
+                                        <Typography variant="subtitle1" component="p" className = {classes.categories}>
                                             {restaurant.categories}
                                          </Typography>
                                     </CardContent>
