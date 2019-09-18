@@ -63,3 +63,13 @@
 .restaurant-NoOfCustomerRated{
     font-weight: bold;
 }
+
+.item-price{
+    display:flex;
+    align-items: baseline;
+    margin-left: auto;
+}
+.menu-item-container{
+    display: flex;
+    align-items: center;
+}
