@@ -450,7 +450,7 @@ class Header extends Component {
             <div>
                 <header className="app-header">
                     <FastfoodIcon className="app-logo" fontSize="large" htmlColor="white" />
-                    {this.props.showHeaderSearchBox == true && 
+                    {this.props.showHeaderSearchBox === true && 
                     <span className="header-searchbox">
                         <Input className={classes.searchText}
                             startAdornment={
