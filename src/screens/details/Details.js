@@ -11,6 +11,8 @@ import CardHeader from '@material-ui/core/CardHeader';
 import Avatar from '@material-ui/core/Avatar';
 import Badge from '@material-ui/core/Badge';
 import Button from '@material-ui/core/Button';
+import Snackbar from '@material-ui/core/Snackbar';
+import Fade from '@material-ui/core/Fade';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import 'font-awesome/css/font-awesome.min.css';
 import '@fortawesome/fontawesome-free-solid';
@@ -96,7 +98,10 @@ class Details extends Component {
         super()
         this.state = {
             restaurantDetails: [],
-            categories: []
+            categories: [],
+            snackBarOpen: true,
+            snackBarMessage: "Hello Im SnackBar",
+            transition: Fade,
         }
     }
 
@@ -138,6 +143,17 @@ class Details extends Component {
         xhrRestaurantDetails.open('GET', this.props.baseUrl + 'restaurant/' + this.props.match.params.id)
         xhrRestaurantDetails.send(data);
 
+    }
+
+    snackBarClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        this.setState({
+            ...this.state,
+            snackBarMessage: "",
+            snackBarOpen: false,
+        })
     }
 
     render() {
@@ -244,6 +260,22 @@ class Details extends Component {
 
                         </Card>
                     </div>
+                </div>
+                <div>
+                    <Snackbar
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'left',
+                        }}
+                        open={this.state.snackBarOpen}
+                        autoHideDuration={4000}
+                        onClose={this.snackBarClose}
+                        TransitionComponent={this.state.transition}
+                        ContentProps={{
+                            'aria-describedby': 'message-id',
+                        }}
+                        message={<span id="message-id">{this.state.snackBarMessage}</span>}
+                    />
                 </div>
             </div>
         )
