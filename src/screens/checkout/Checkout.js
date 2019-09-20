@@ -17,6 +17,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
+import FilledInput from '@material-ui/core/FilledInput';
 import 'font-awesome/css/font-awesome.min.css';
 
 
@@ -114,7 +115,20 @@ const styles = (theme => ({
     },
     divider:{
         'margin':'10px 0px'
+    },
+    couponInput:{
+        'width':'150px',
+        '@media(min-width:1300px)':{
+            width:'200px',
+        },
+        '@media(max-width:600px)':{
+            width:'250px',
+        }
+    },
+    applyButton:{
+        height:'40px'
     }
+  
 }))
 
 const TabContainer = function (props) {
@@ -601,10 +615,33 @@ class Checkout extends Component {
                                             </div>
                                         </div>
                                     ))}
+                                    <div className="coupon-container">
+                                    <FormControl className={classes.formControlCoupon}>
+                                    <InputLabel htmlFor="coupon">Coupon Code</InputLabel>
+                                    <FilledInput id="coupon" className={classes.couponInput} value={this.state.coupon} onChange={this.inputCouponChangeHandler} placeholder="Ex: FLAT30"/>
+                                    </FormControl>
+                                    <Button variant="contained" color="default" className={classes.applyButton} size="small">APPLY</Button>
+                                    </div>
+                                    <div className="label-amount-container">
+                                        <Typography variant="subtitle2" component="p" style={{ color: 'grey' }}>Sub Total</Typography>
+                                        <div className="amount">
+                                            <i className="fa fa-inr" aria-hidden="true" style={{ color: 'grey' }}></i>
+                                            <Typography variant="subtitle1" component="p" style={{ color: 'grey' }} id="summary-net-amount">{200.00}</Typography>
+                                        </div>
+                                    </div>
+                                    <div className="label-amount-container">
+                                        <Typography variant="subtitle2" component="p" className={classes.netAmount} style={{ color: 'grey' }}>Discount</Typography>
+                                        <div className="amount">
+                                            <i className="fa fa-inr" aria-hidden="true" style={{ color: 'grey' }}></i>
+                                            <Typography variant="subtitle1" component="p" style={{ color: 'grey' }} id="summary-net-amount">{200.00}</Typography>
+                                        </div>
+                                    </div>
+                                   
+                                   
                                     <Divider className={classes.divider} />
-                                    <div className="net-amount-container">
+                                    <div className="label-amount-container">
                                         <Typography variant="subtitle2" component="p" className={classes.netAmount}>Net Amount</Typography>
-                                        <div className="net-amount">
+                                        <div className="amount">
                                             <i className="fa fa-inr" aria-hidden="true" style={{ color: 'grey' }}></i>
                                             <Typography variant="subtitle1" component="p" className={classes.itemPrice} id="summary-net-amount">{200.00}</Typography>
                                         </div>

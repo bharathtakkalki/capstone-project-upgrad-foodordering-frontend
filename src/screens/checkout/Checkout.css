@@ -58,11 +58,19 @@
 #summary-net-amount{
     margin-left: 6px;
 }
-.net-amount{
+.amount{
     display:flex;
     align-items: baseline;
 }
-.net-amount-container{
+.coupon-container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0px;
+}
+
+
+.label-amount-container{
     display: flex;
     align-items: baseline;
     justify-content: space-between;
