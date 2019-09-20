@@ -41,7 +41,7 @@ const styles = (theme => ({
     },
     gridListTile: {
         textAlign: 'left',
-        margin: '40px 10px 20px 10px',
+        margin: '40px 0px 20px 0px',
         'border-style': 'solid',
         'border-width': '0.5px 3px 3px 0.5px',
         'border-radius': '10px',
@@ -105,18 +105,6 @@ class Checkout extends Component {
 
         }
     }
-
-    MenuProps = {
-        style: {
-            'margin-top': '50px',
-            maxHeight: '300px'
-        },
-        anchorOrigin: {
-            vertical: "center",
-            horizontal: "left"
-        }
-    }
-
 
 
     getSteps = () => {
@@ -186,6 +174,38 @@ class Checkout extends Component {
         xhrAddress.send(data);
     }
 
+    inputFlatBuildingNameChangeHandler = (event) => {
+        this.setState({
+            ...this.state,
+            flatBuildingName: event.target.value,
+        })
+    }
+    inputLocalityChangeHandler = (event) => {
+        this.setState({
+            ...this.state,
+            locality: event.target.value,
+        })
+    }
+    inputCityChangeHandler = (event) => {
+        this.setState({
+            ...this.state,
+            city: event.target.value,
+        })
+    }
+    selectStateChangeHandler = (event) => {
+        this.setState({
+            ...this.state,
+            state: event.target.value,
+        })
+    }
+    inputPincodeChangeHandler = (event) => {
+        this.setState({
+            ...this.state,
+            pincode: event.target.value,
+        })
+    }
+
+    
     addressSelectedClickHandler = (addressId) => {
         let addresses = this.state.addresses;
         addresses.forEach(address => {
@@ -205,6 +225,7 @@ class Checkout extends Component {
         const { classes } = this.props;
         return (
             <div>
+                {console.log(this.props.cartItems)}
                 <Header baseUrl={this.props.baseUrl} showHeaderSearchBox={false} />
                 <div className="flex-container">
                     <div className="stepper-container">
@@ -222,7 +243,7 @@ class Checkout extends Component {
                                                 {this.state.value === 0 &&
                                                     <TabContainer>
                                                         {this.state.addresses.length !== 0 ?
-                                                            <GridList className={classes.gridList} cols={3} spacing={3} cellHeight='auto'>
+                                                            <GridList className={classes.gridList} cols={3} spacing={2} cellHeight='auto'>
                                                                 {this.state.addresses.map(address => (
                                                                     <GridListTile className={classes.gridListTile} key={address.id} style={{ borderColor: address.selected ? "rgb(224,37,96)" : "white" }}>
                                                                         <div className="grid-list-tile-container">
@@ -274,7 +295,7 @@ class Checkout extends Component {
                                                         <br />
                                                         <FormControl required className={classes.formControlSelect}>
                                                             <InputLabel htmlFor="state">State</InputLabel>
-                                                            <Select id="state" className={classes.selectField} state={this.state.state} onChange={this.selectStateChangeHandler} MenuProps={this.MenuProps} value={this.state.state}>
+                                                            <Select id="state" className={classes.selectField} state={this.state.state} onChange={this.selectStateChangeHandler} MenuProps={{style: {marginTop: '50px',maxHeight: '300px'}}} value={this.state.state}>
                                                                 {this.state.states.map((state, index) => (
                                                                     <MenuItem value={index}>{state}</MenuItem>
                                                                 ))}
