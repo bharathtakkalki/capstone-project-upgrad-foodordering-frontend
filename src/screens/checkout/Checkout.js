@@ -14,7 +14,6 @@ import Paper from '@material-ui/core/Paper';
 
 import Header from '../../common/header/Header';
 import '../checkout/Checkout.css'
-import { noAuto } from '@fortawesome/fontawesome-svg-core';
 
 const styles = (theme => ({
 
@@ -22,7 +21,7 @@ const styles = (theme => ({
         marginBottom: theme.spacing(2),
     },
     button: {
-        marginTop: theme.spacing(1),
+        marginTop: theme.spacing(2),
         marginRight: theme.spacing(1),
     },
     resetContainer: {
@@ -39,10 +38,16 @@ const styles = (theme => ({
     gridListTile: {
         textAlign: 'left',
         margin: '40px 10px 20px 10px',
+        'border-style': 'solid',
+        'border-width': '0.5px 3px 3px 0.5px',
+        'border-color': 'rgb(224,37,96)',
+        'border-radius': '10px',
+        'padding':'8px'
     },
     addressCheckButton: {
         'float': 'right',
-    }
+    },
+
 
 
 
@@ -117,26 +122,29 @@ class Checkout extends Component {
                                     <StepLabel>{label}</StepLabel>
                                     <StepContent>
                                         {index === 0 &&
-                                            <div className = "address-container">
+                                            <div className="address-container">
                                                 <Tabs className="address-tabs" value={this.state.value} onChange={this.tabsChangeHandler}>
                                                     <Tab label="EXISTING ADDRESS" className={classes.tab} />
                                                     <Tab label="NEW ADDRESS" className={classes.tab} />
                                                 </Tabs>
                                                 {this.state.value === 0 &&
                                                     <TabContainer>
-                                                        <GridList className={classes.gridList} cols={3} cellHeight={300}>
+                                                        <GridList className={classes.gridList} cols={3} cellHeight='auto'>
+
                                                             <GridListTile className={classes.gridListTile}>
+                                                                <div className="grid-list-tile-container">
                                                                 <Typography variant="body1" component="p">#546</Typography>
                                                                 <Typography variant="body1" component="p">Amarjyothi Layout,</Typography>
                                                                 <Typography variant="body1" component="p">H.B.C.S. Domlur</Typography>
                                                                 <Typography variant="body1" component="p">Bengaluru</Typography>
                                                                 <Typography variant="body1" component="p">Karnataka</Typography>
                                                                 <Typography variant="body1" component="p">560071</Typography>
-                                                                <IconButton className={classes.addressCheckButton}>
+                                                                <IconButton className={classes.addressCheckButton} onClick={this.addressSelectedClickHandler}>
                                                                     <CheckCircleIcon />
                                                                 </IconButton>
-
+                                                                </div>
                                                             </GridListTile>
+
                                                         </GridList>
                                                     </TabContainer>
                                                 }
