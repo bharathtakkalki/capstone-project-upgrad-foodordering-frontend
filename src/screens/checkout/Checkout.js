@@ -476,7 +476,7 @@ class Checkout extends Component {
                                                 <Button
                                                     disabled={this.state.activeStep === 0}
                                                     onClick={this.backButtonClickHandler}
-                                                    className={classes.Button}
+                                                    className={classes.button}
                                                 >
                                                     Back
                                                 </Button>
