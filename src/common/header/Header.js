@@ -94,7 +94,7 @@ class Header extends Component {
             loginContactNoRequired: "dispNone",
             loginPassword: "",
             loginPasswordRequired: "dispNone",
-            firstName: "bharath",
+            firstName: "",
             firstNameRequired: "dispNone",
             lastName: "",
             email: "",
