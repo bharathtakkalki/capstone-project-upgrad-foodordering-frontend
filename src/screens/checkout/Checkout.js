@@ -95,12 +95,12 @@ class Checkout extends Component {
             localityRequired: "dispNone",
             city: "",
             cityRequired: "dispNone",
-            state: "",
+            selectedState: "",
             stateRequired: "dispNone",
             pincode: "",
             pincodeRequired: "dispNone",
             pincodeHelpText: "dispNone",
-            states: ["Karnataka", "Tamil Nadu", "Andhra Pradesh", "Maharashtra", "Goa", "Delhi", "Uttar Pradesh"],
+            states:[],
 
 
         }
@@ -172,6 +172,22 @@ class Checkout extends Component {
         xhrAddress.open('GET', this.props.baseUrl + 'address/customer');
         xhrAddress.setRequestHeader('authorization', 'Bearer ' + this.state.accessToken)
         xhrAddress.send(data);
+
+
+        let statesData = null;
+        let xhrStates = new XMLHttpRequest();
+        xhrStates.addEventListener("readystatechange",function(){
+            if(xhrStates.readyState === 4 && xhrStates.status === 200){
+                let states = JSON.parse(xhrStates.responseText).states;
+                that.setState({
+                    ...that.state,
+                    states:states,
+                })
+            }
+        })
+
+        xhrStates.open('GET',this.props.baseUrl+'states')
+        xhrStates.send(statesData);
     }
 
     inputFlatBuildingNameChangeHandler = (event) => {
@@ -192,10 +208,10 @@ class Checkout extends Component {
             city: event.target.value,
         })
     }
-    selectStateChangeHandler = (event) => {
+    selectSelectedStateChangeHandler = (event) => {
         this.setState({
             ...this.state,
-            state: event.target.value,
+            selectedState: event.target.value,
         })
     }
     inputPincodeChangeHandler = (event) => {
@@ -225,7 +241,6 @@ class Checkout extends Component {
         const { classes } = this.props;
         return (
             <div>
-                {console.log(this.props.cartItems)}
                 <Header baseUrl={this.props.baseUrl} showHeaderSearchBox={false} />
                 <div className="flex-container">
                     <div className="stepper-container">
@@ -295,9 +310,9 @@ class Checkout extends Component {
                                                         <br />
                                                         <FormControl required className={classes.formControlSelect}>
                                                             <InputLabel htmlFor="state">State</InputLabel>
-                                                            <Select id="state" className={classes.selectField} state={this.state.state} onChange={this.selectStateChangeHandler} MenuProps={{style: {marginTop: '50px',maxHeight: '300px'}}} value={this.state.state}>
+                                                            <Select id="state" className={classes.selectField} state={this.state.selectedState} onChange={this.selectSelectedStateChangeHandler} MenuProps={{style: {marginTop: '50px',maxHeight: '300px'}}} value={this.state.selectedState}>
                                                                 {this.state.states.map((state, index) => (
-                                                                    <MenuItem value={index}>{state}</MenuItem>
+                                                                    <MenuItem value={state.id}>{state.state_name}</MenuItem>
                                                                 ))}
                                                             </Select>
                                                             <FormHelperText className={this.state.stateRequired}>
