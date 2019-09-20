@@ -40,7 +40,6 @@ const styles = (theme => ({
         margin: '40px 10px 20px 10px',
         'border-style': 'solid',
         'border-width': '0.5px 3px 3px 0.5px',
-        'border-color': 'rgb(224,37,96)',
         'border-radius': '10px',
         'padding':'8px'
     },
@@ -72,6 +71,8 @@ class Checkout extends Component {
             activeStep: 0,
             steps: this.getSteps(),
             value: 0,
+            accessToken:sessionStorage.getItem('access-token'),
+            addresses:[],
 
         }
     }
@@ -109,6 +110,54 @@ class Checkout extends Component {
         });
     }
 
+    componentDidMount(){
+        let data = null;
+        let that = this;
+        let xhrAddress = new XMLHttpRequest();
+
+        xhrAddress.addEventListener('readystatechange',function(){
+            if(xhrAddress.readyState === 4 && xhrAddress.status === 200){
+                let responseAddresses = JSON.parse(xhrAddress.responseText).addresses;
+                let addresses=[];
+                responseAddresses.forEach(responseAddress => {
+                    let address = {
+                        id:responseAddress.id,
+                        city:responseAddress.city,
+                        flatBuildingName:responseAddress.flat_building_name,
+                        locality:responseAddress.locality,
+                        pincode:responseAddress.pincode,
+                        state:responseAddress.state,
+                        selected:false,
+                    }
+                    addresses.push(address)
+                })
+                that.setState({
+                    ...that.state,
+                    addresses:addresses
+                })
+            }
+        })
+
+        xhrAddress.open('GET',this.props.baseUrl + 'address/customer');
+        xhrAddress.setRequestHeader('authorization','Bearer '+this.state.accessToken)
+        xhrAddress.send(data);
+    }
+
+    addressSelectedClickHandler = (addressId) =>{
+        let addresses = this.state.addresses;
+        addresses.forEach(address => {
+            if(address.id === addressId){
+                address.selected = true;
+            }else{
+                address.selected = false;
+            }
+        })
+        this.setState({
+            ...this.state,
+            addresses:addresses,
+        })
+    }
+
     render() {
         const { classes } = this.props;
         return (
@@ -129,23 +178,26 @@ class Checkout extends Component {
                                                 </Tabs>
                                                 {this.state.value === 0 &&
                                                     <TabContainer>
-                                                        <GridList className={classes.gridList} cols={3} cellHeight='auto'>
-
-                                                            <GridListTile className={classes.gridListTile}>
+                                                        {this.state.addresses.length !== 0 ? 
+                                                        <GridList className={classes.gridList} cols={3} spacing={3} cellHeight='auto'>
+                                                            {this.state.addresses.map(address => (
+                                                            <GridListTile className={classes.gridListTile} key={address.id} style={{borderColor:address.selected ? "rgb(224,37,96)":"white"}}>
                                                                 <div className="grid-list-tile-container">
-                                                                <Typography variant="body1" component="p">#546</Typography>
-                                                                <Typography variant="body1" component="p">Amarjyothi Layout,</Typography>
-                                                                <Typography variant="body1" component="p">H.B.C.S. Domlur</Typography>
-                                                                <Typography variant="body1" component="p">Bengaluru</Typography>
-                                                                <Typography variant="body1" component="p">Karnataka</Typography>
-                                                                <Typography variant="body1" component="p">560071</Typography>
-                                                                <IconButton className={classes.addressCheckButton} onClick={this.addressSelectedClickHandler}>
-                                                                    <CheckCircleIcon />
+                                                                <Typography variant="body1" component="p">{address.flatBuildingName}</Typography>
+                                                                <Typography variant="body1" component="p">{address.locality}</Typography>
+                                                                <Typography variant="body1" component="p">{address.city}</Typography>
+                                                                <Typography variant="body1" component="p">{address.state.state_name}</Typography>
+                                                                <Typography variant="body1" component="p">{address.pincode}</Typography>
+                                                                <IconButton className={classes.addressCheckButton} onClick={() => this.addressSelectedClickHandler(address.id)}>
+                                                                    <CheckCircleIcon style={{color:address.selected ? "green":"grey"}} />
                                                                 </IconButton>
                                                                 </div>
                                                             </GridListTile>
-
+                                                            ))}
                                                         </GridList>
+                                                        :
+                                                        <Typography variant="body1" component="p">There are no saved addresses! You can save an address using the 'New Address' tab or using your ‘Profile’ menu option.</Typography>
+                                                            }
                                                     </TabContainer>
                                                 }
                                             </div>
