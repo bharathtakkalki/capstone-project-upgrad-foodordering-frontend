@@ -148,7 +148,7 @@ class Checkout extends Component {
             value: 0,
             accessToken: sessionStorage.getItem('access-token'),
             addresses: [],
-            selectedAddress:"",
+            selectedAddress: "",
             flatBuildingName: "",
             flatBuildingNameRequired: "dispNone",
             locality: "",
@@ -164,10 +164,11 @@ class Checkout extends Component {
             selectedPayment: "",
             payment: [],
             cartItems: props.location.cartItems,
-            restaurantDetails:props.location.restaurantDetails,
-            coupon:null,
-            couponName:"",
-        
+            restaurantDetails: props.location.restaurantDetails,
+            coupon: null,
+            couponName: "",
+            couponNameRequired: "dispNone",
+            couponNameHelpText: "dispNone",
         }
     }
 
@@ -399,20 +400,71 @@ class Checkout extends Component {
         })
     }
 
+    inputCouponNameChangeHandler = (event) => {
+        this.setState({
+            ...this.state,
+            couponName: event.target.value,
+        })
+    }
+    applyButtonClickHandler = () => {
+        let isCouponNameValid = true;
+        let couponNameRequired = "dispNone";
+        let couponNameHelpText = "dispNone";
+        if(this.state.couponName === "" ){
+            isCouponNameValid = false;
+            couponNameRequired = "dispBlock";
+            this.setState({
+                couponNameRequired:couponNameRequired,
+                couponNameHelpText:couponNameHelpText,
+            })
+        }
+        
+        if(isCouponNameValid){
+            let couponData = null;
+            let that = this;
+            let xhrCoupon = new XMLHttpRequest();
+            xhrCoupon.addEventListener("readystatechange", function () {
+                if (xhrCoupon.readyState === 4) {
+                    if (xhrCoupon.status === 200) {
+                        let coupon = JSON.parse(xhrCoupon.responseText)
+                        that.setState({
+                            ...that.state,
+                            coupon: coupon,
+                        })
+                    } else {
+                        that.setState({
+                            ...that.state,
+                            couponNameHelpText: "dispBlock",
+                            couponNameRequired:"dispNone"
+                        })
+                    }
+                }
+            })
+
+            xhrCoupon.open('GET', this.props.baseUrl + '/order/coupon/' + this.state.couponName)
+            xhrCoupon.setRequestHeader('authorization', 'Bearer ' + this.state.accessToken)
+            xhrCoupon.setRequestHeader("Content-Type", "application/json");
+            xhrCoupon.setRequestHeader("Cache-Control", "no-cache");
+            xhrCoupon.send(couponData);
+        }
+        
+    }
+
+
     placeOrderButtonClickHandler = () => {
         let item_quantities = [];
         this.state.cartItems.forEach(cartItem => {
             item_quantities.push({
-                'item_id':cartItem.id,
-                'price':cartItem.totalAmount,
-                'quantity':cartItem.quantity,
+                'item_id': cartItem.id,
+                'price': cartItem.totalAmount,
+                'quantity': cartItem.quantity,
             });
         })
         let newOrderData = JSON.stringify({
             "address_id": this.state.selectedAddress,
             "bill": Math.floor(Math.random() * 100),
-            "coupon_id": "string",
-            "discount": 0,
+            "coupon_id": this.state.coupon.id,
+            "discount": this.getDiscountAmount,
             "item_quantities": item_quantities,
             "payment_id": this.state.selectedPayment,
             "restaurant_id": this.state.restaurantDetails.id,
@@ -435,7 +487,7 @@ class Checkout extends Component {
         this.setState({
             ...this.state,
             addresses: addresses,
-            selectedAddress:selectedAddress
+            selectedAddress: selectedAddress
         })
     }
     getSubTotal = () => {
@@ -448,15 +500,16 @@ class Checkout extends Component {
 
     getDiscountAmount = () => {
         let discountAmount = 0;
-        if(this.state.coupon !== null){
-            discountAmount = (this.getSubTotal() * this.state.coupon.discount) / 100;
+        if (this.state.coupon !== null) {
+            console.log(discountAmount)
+            discountAmount = (this.getSubTotal() * this.state.coupon.percent)/100;
             return discountAmount
         }
         return discountAmount;
     }
     getNetAmount = () => {
-        let netAmount  = this.getSubTotal() - this.getDiscountAmount();
-        return netAmount;   
+        let netAmount = this.getSubTotal() - this.getDiscountAmount();
+        return netAmount;
     }
 
     render() {
@@ -635,7 +688,13 @@ class Checkout extends Component {
                                 <div className="coupon-container">
                                     <FormControl className={classes.formControlCoupon}>
                                         <InputLabel htmlFor="coupon">Coupon Code</InputLabel>
-                                        <FilledInput id="coupon" className={classes.couponInput} value={this.state.couponName} onChange={this.inputCouponChangeHandler} placeholder="Ex: FLAT30" />
+                                        <FilledInput id="coupon" className={classes.couponInput} value={this.state.couponName} onChange={this.inputCouponNameChangeHandler} placeholder="Ex: FLAT30" />
+                                        <FormHelperText className={this.state.couponNameRequired}>
+                                            <span className="red">required</span>
+                                        </FormHelperText>
+                                        <FormHelperText className={this.state.couponNameHelpText}>
+                                            <span className="red">invalid coupon</span>
+                                        </FormHelperText>
                                     </FormControl>
                                     <Button variant="contained" color="default" className={classes.applyButton} onClick={this.applyButtonClickHandler} size="small">APPLY</Button>
                                 </div>
