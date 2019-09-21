@@ -18,6 +18,10 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
 import FilledInput from '@material-ui/core/FilledInput';
+import Snackbar from '@material-ui/core/Snackbar';
+import Fade from '@material-ui/core/Fade';
+import CloseIcon from '@material-ui/icons/Close';
+import { Redirect } from 'react-router-dom'
 import 'font-awesome/css/font-awesome.min.css';
 
 
@@ -169,6 +173,10 @@ class Checkout extends Component {
             couponName: "",
             couponNameRequired: "dispNone",
             couponNameHelpText: "dispNone",
+            snackBarOpen: false,
+            snackBarMessage: "",
+            transition: Fade,
+            isLoggedIn:sessionStorage.getItem('access-token') === null? true:false,
         }
     }
 
@@ -184,6 +192,12 @@ class Checkout extends Component {
                     ...this.state,
                     activeStep: activeStep,
                 });
+            } else {
+                this.setState({
+                    ...this.state,
+                    snackBarOpen: true,
+                    snackBarMessage: "Select Address"
+                })
             }
         }
     }
@@ -473,15 +487,27 @@ class Checkout extends Component {
         })
         let that = this;
         let xhrOrder = new XMLHttpRequest();
-        xhrOrder.addEventListener("readystatechange",function(){
-            if(xhrOrder.readyState === 4 && xhrOrder.status === 201){
-                let responseOrder = JSON.parse(xhrOrder.responseText) 
-                console.log(responseOrder);
+        xhrOrder.addEventListener("readystatechange", function () {
+            if (xhrOrder.readyState === 4) {
+                if (xhrOrder.status === 201) {
+                    let responseOrder = JSON.parse(xhrOrder.responseText)
+                    that.setState({
+                        ...that.state,
+                        snackBarOpen:true,
+                        snackBarMessage:"Order placed successfully! Your order ID is "+responseOrder.id,
+                    });
+                }else{
+                    that.setState({
+                        ...that.state,
+                        snackBarOpen:true,
+                        snackBarMessage:"Unable to place your order! Please try again!",
+                    });
+                }
             }
         })
-        xhrOrder.open('POST',this.props.baseUrl+'order')
-        xhrOrder.setRequestHeader('authorization','Bearer '+this.state.accessToken)
-        xhrOrder.setRequestHeader('Content-Type','application/json');
+        xhrOrder.open('POST', this.props.baseUrl + 'order')
+        xhrOrder.setRequestHeader('authorization', 'Bearer ' + this.state.accessToken)
+        xhrOrder.setRequestHeader('Content-Type', 'application/json');
         xhrOrder.send(newOrderData);
     }
 
@@ -524,10 +550,27 @@ class Checkout extends Component {
         return netAmount;
     }
 
+    snackBarClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        this.setState({
+            ...this.state,
+            snackBarMessage: "",
+            snackBarOpen: false,
+        })
+    }
+    redirectToHome = () => {
+        if (this.state.isLoggedIn) {
+           return <Redirect to = "/"/>
+        }
+    }
+
     render() {
         const { classes } = this.props;
         return (
             <div>
+                {this.redirectToHome()}
                 <Header baseUrl={this.props.baseUrl} showHeaderSearchBox={false} />
                 <div className="checkout-container">
                     <div className="stepper-container">
@@ -741,6 +784,27 @@ class Checkout extends Component {
 
                         </Card>
                     </div>
+                </div>
+                <div>
+                    <Snackbar
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'left',
+                        }}
+                        open={this.state.snackBarOpen}
+                        autoHideDuration={4000}
+                        onClose={this.snackBarClose}
+                        TransitionComponent={this.state.transition}
+                        ContentProps={{
+                            'aria-describedby': 'message-id',
+                        }}
+                        message={<span id="message-id">{this.state.snackBarMessage}</span>}
+                        action={
+                            <IconButton color='inherit' onClick={this.snackBarClose}>
+                                <CloseIcon />
+                            </IconButton>
+                        }
+                    />
                 </div>
             </div >
         )
