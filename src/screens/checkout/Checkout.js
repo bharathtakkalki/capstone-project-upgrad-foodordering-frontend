@@ -176,7 +176,7 @@ class Checkout extends Component {
             snackBarOpen: false,
             snackBarMessage: "",
             transition: Fade,
-            isLoggedIn:sessionStorage.getItem('access-token') === null? true:false,
+            isLoggedIn:sessionStorage.getItem('access-token') === null? false:true,
         }
     }
 
@@ -561,7 +561,7 @@ class Checkout extends Component {
         })
     }
     redirectToHome = () => {
-        if (this.state.isLoggedIn) {
+        if (!this.state.isLoggedIn) {
            return <Redirect to = "/"/>
         }
     }
