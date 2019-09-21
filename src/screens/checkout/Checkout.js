@@ -177,12 +177,14 @@ class Checkout extends Component {
     }
     nextButtonClickHandler = () => {
         if (this.state.value === 0) {
-            let activeStep = this.state.activeStep;
-            activeStep++;
-            this.setState({
-                ...this.state,
-                activeStep: activeStep,
-            });
+            if (this.state.selectedAddress !== "") {
+                let activeStep = this.state.activeStep;
+                activeStep++;
+                this.setState({
+                    ...this.state,
+                    activeStep: activeStep,
+                });
+            }
         }
     }
 
@@ -410,16 +412,16 @@ class Checkout extends Component {
         let isCouponNameValid = true;
         let couponNameRequired = "dispNone";
         let couponNameHelpText = "dispNone";
-        if(this.state.couponName === "" ){
+        if (this.state.couponName === "") {
             isCouponNameValid = false;
             couponNameRequired = "dispBlock";
             this.setState({
-                couponNameRequired:couponNameRequired,
-                couponNameHelpText:couponNameHelpText,
+                couponNameRequired: couponNameRequired,
+                couponNameHelpText: couponNameHelpText,
             })
         }
-        
-        if(isCouponNameValid){
+
+        if (isCouponNameValid) {
             let couponData = null;
             let that = this;
             let xhrCoupon = new XMLHttpRequest();
@@ -435,7 +437,7 @@ class Checkout extends Component {
                         that.setState({
                             ...that.state,
                             couponNameHelpText: "dispBlock",
-                            couponNameRequired:"dispNone"
+                            couponNameRequired: "dispNone"
                         })
                     }
                 }
@@ -447,7 +449,7 @@ class Checkout extends Component {
             xhrCoupon.setRequestHeader("Cache-Control", "no-cache");
             xhrCoupon.send(couponData);
         }
-        
+
     }
 
 
@@ -464,12 +466,23 @@ class Checkout extends Component {
             "address_id": this.state.selectedAddress,
             "bill": Math.floor(Math.random() * 100),
             "coupon_id": this.state.coupon.id,
-            "discount": this.getDiscountAmount,
+            "discount": this.getDiscountAmount(),
             "item_quantities": item_quantities,
             "payment_id": this.state.selectedPayment,
             "restaurant_id": this.state.restaurantDetails.id,
         })
-        console.log(newOrderData);
+        let that = this;
+        let xhrOrder = new XMLHttpRequest();
+        xhrOrder.addEventListener("readystatechange",function(){
+            if(xhrOrder.readyState === 4 && xhrOrder.status === 201){
+                let responseOrder = JSON.parse(xhrOrder.responseText) 
+                console.log(responseOrder);
+            }
+        })
+        xhrOrder.open('POST',this.props.baseUrl+'order')
+        xhrOrder.setRequestHeader('authorization','Bearer '+this.state.accessToken)
+        xhrOrder.setRequestHeader('Content-Type','application/json');
+        xhrOrder.send(newOrderData);
     }
 
 
@@ -501,8 +514,7 @@ class Checkout extends Component {
     getDiscountAmount = () => {
         let discountAmount = 0;
         if (this.state.coupon !== null) {
-            console.log(discountAmount)
-            discountAmount = (this.getSubTotal() * this.state.coupon.percent)/100;
+            discountAmount = (this.getSubTotal() * this.state.coupon.percent) / 100;
             return discountAmount
         }
         return discountAmount;
