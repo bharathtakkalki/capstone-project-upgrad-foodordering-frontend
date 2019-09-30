@@ -8,9 +8,9 @@ import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
-import { FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import '@fortawesome/fontawesome-free-solid';
-import'@fortawesome/fontawesome-svg-core';
+import '@fortawesome/fontawesome-svg-core';
 
 
 import './Home.css';
@@ -29,13 +29,14 @@ const styles = (theme => ({
         transform: 'translateZ(0)',
         cursor: 'pointer',
     },
-
     gridCard:{ //Style for the Grid card 
         '@media (min-width: 1200px)':{ //Making the code responsive to different screens
+
             'flex-grow': '0',
             'max-width': '25%',
             'flex-basis': '25%',
         },
+
         '@media (min-width: 960px) and (max-width:1200px)':{ //Making the code responsive to different screens 
             'flex-grow': '0',
             'max-width': '33%',
@@ -58,32 +59,31 @@ const styles = (theme => ({
         width: "100%",
         // paddingTop: '56.25%', // 16:9
     },
-
     title:{ //Style for the Title in the Card 
         "font-size":"25px",
         '@media (min-width: 1300px)':{
             "font-size":"40px",
         },
-        '@media (min-width: 960px) and (max-width:1300px)':{
-            "font-size":"30px",
+        '@media (min-width: 960px) and (max-width:1300px)': {
+            "font-size": "30px",
         },
-        '@media (max-width: 960px)':{
-            "font-size":"40px",
+        '@media (max-width: 960px)': {
+            "font-size": "40px",
         }
     },
-
     categories:{ //Style for the categories in the card
         "font-size":"16px",
         '@media (min-width: 1300px)':{
             "font-size":"22px",
         },
-        '@media (min-width: 960px) and (max-width:1300px)':{
-            "font-size":"20px",
+        '@media (min-width: 960px) and (max-width:1300px)': {
+            "font-size": "20px",
         },
-        '@media (max-width: 960px)':{
-            "font-size":"22px",
+        '@media (max-width: 960px)': {
+            "font-size": "22px",
         }
     },
+
 
     cardContent:{ // Styles for the card content
         "padding":"10px",
@@ -101,17 +101,16 @@ const styles = (theme => ({
         "justify-content": "space-between",
 
     }
-  
-    
 
 }))
 
 // Creating Home class component to render the home page as per the design
 class Home extends Component {
-    constructor(){
+    constructor() {
         super()
         this.state = {
-            restaurant:[],
+            restaurant: [],
+            isSearchOn: false,
         }
     }
 
@@ -127,7 +126,7 @@ class Home extends Component {
                 let restaurant = JSON.parse(xhrRestaurant.responseText)
                 console.log(restaurant.restaurants)
                 that.setState({
-                    restaurant:restaurant.restaurants
+                    restaurant: restaurant.restaurants
                 });
             }
         })
@@ -135,11 +134,36 @@ class Home extends Component {
         xhrRestaurant.send(data)
     }
 
+    updateSearchRestaurant = (searchRestaurant, searchOn) => {
+        let allRestaurantData = [];
+        if (searchOn) {
+            if (!this.state.isSearchOn) {
+                allRestaurantData = this.state.restaurant;
+                this.setState({
+                    restaurant: searchRestaurant,
+                    allRestaurantData: allRestaurantData,
+                    isSearchOn: true,
+                })
+            } else {
+                this.setState({
+                    ...this.state,
+                    restaurant: searchRestaurant,
+                })
+            }
+        } else {
+            allRestaurantData = this.state.allRestaurantData;
+            this.setState({
+                restaurant: allRestaurantData,
+                isSearchOn: false,
+            });
+        }
+    }
+
 
     //This Method Handles the click on the restaurant card.
     //It takes the restaurant id as the Parameter and then pushes the restaurantDetails page 
     restaurantCardClicked = (restaurantId) => {
-        this.props.history.push('/restaurant/'+restaurantId);
+        this.props.history.push('/restaurant/' + restaurantId);
     }
 
     render() {
@@ -198,8 +222,9 @@ class Home extends Component {
                         </Grid>
                     </div>
                 </div>
-                )
-            }
-        }
-        
+            </div>
+        )
+    }
+}
+
 export default withStyles(styles)(Home);

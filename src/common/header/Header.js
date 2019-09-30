@@ -52,8 +52,8 @@ const styles = (theme => ({
         "text-decoration": "none",
         "color": "black",
         "text-decoration-underline": "none",
-        "padding-top":"0px",
-        "padding-bottom":"0px",
+        "padding-top": "0px",
+        "padding-bottom": "0px",
     },
     menuList: { //Styling for the menulist component
         padding: "0px"
@@ -118,7 +118,7 @@ class Header extends Component {
             snackBarMessage: "",
             transition: Fade,
             loggedIn: sessionStorage.getItem('access-token') === null ? false : true,
-            loggedInName:sessionStorage.getItem('customer-name'),
+            loggedInName: sessionStorage.getItem('customer-name'),
 
         }
 
@@ -231,13 +231,44 @@ class Header extends Component {
             signUpContactNo: event.target.value,
         })
     }
+    
+    inputSearchChangeHandler = (event) => {
+        let searchOn = true
+        if (! (event.target.value === "")) {
+            let dataRestaurant = null;
+            let that = this
+            let xhrSearchRestaurant = new XMLHttpRequest();
+
+
+            console.log(event.target.value)
+
+            xhrSearchRestaurant.addEventListener("readystatechange", function () {
+                if (xhrSearchRestaurant.readyState === 4 && xhrSearchRestaurant.status === 200) {
+                    var restaurant = JSON.parse(this.responseText).restaurants;
+                    that.props.updateSearchRestaurant(restaurant,searchOn);
+                }
+            })
+
+            xhrSearchRestaurant.open('GET', this.props.baseUrl + 'restaurant/name/' + event.target.value)
+            xhrSearchRestaurant.setRequestHeader("Content-Type", "application/json");
+            xhrSearchRestaurant.setRequestHeader("Cache-Control", "no-cache");
+            xhrSearchRestaurant.send(dataRestaurant);
+
+        }else{
+            let restaurant =[];
+            searchOn = false
+            this.props.updateSearchRestaurant(restaurant,searchOn);
+
+        }
+    }
+
+
     //This method is called to handle the change in the tabs.
     tabsChangeHandler = (event, value) => {
         this.setState({
             value
         });
     }
-
     //This method handles the click on login button in the login modal 
     //This method calls the login api and sends the login details as required by the endpoint.
     //If the login is successful then adds the access-token,uuid and customer name to the session storage for further use. 
@@ -255,7 +286,7 @@ class Header extends Component {
                         let loginResponse = JSON.parse(this.responseText);
                         sessionStorage.setItem("uuid", JSON.parse(this.responseText).id);
                         sessionStorage.setItem("access-token", xhrLogin.getResponseHeader("access-token"));
-                        sessionStorage.setItem("customer-name",loginResponse.first_name);
+                        sessionStorage.setItem("customer-name", loginResponse.first_name);
                         that.setState({
                             ...that.state,
                             loggedIn: true,
@@ -481,28 +512,28 @@ class Header extends Component {
         let logoutData = null;
         let that = this
         let xhrLogout = new XMLHttpRequest();
-        xhrLogout.addEventListener("readystatechange",function(){
-            if(xhrLogout.readyState === 4 && xhrLogout.status === 200){
+        xhrLogout.addEventListener("readystatechange", function () {
+            if (xhrLogout.readyState === 4 && xhrLogout.status === 200) {
                 sessionStorage.removeItem("uuid"); //Clearing access-token
                 sessionStorage.removeItem("access-token"); //Clearing access-token
                 sessionStorage.removeItem("customer-name"); //Clearing access-token
                 that.setState({
                     ...that.state,
-                    loggedIn:false,
+                    loggedIn: false,
                     menuIsOpen: !that.state.menuIsOpen,
                 });
 
-                if(that.props.logoutRedirect){
+                if (that.props.logoutRedirect) {
                     that.props.logoutRedirect();
                 }
             }
-          
+
         })
 
-        xhrLogout.open('POST',this.props.baseUrl+'customer/logout');
-        xhrLogout.setRequestHeader('authorization','Bearer '+sessionStorage.getItem('access-token'));
+        xhrLogout.open('POST', this.props.baseUrl + 'customer/logout');
+        xhrLogout.setRequestHeader('authorization', 'Bearer ' + sessionStorage.getItem('access-token'));
         xhrLogout.send(logoutData);
-       
+
 
     }
 
@@ -513,17 +544,16 @@ class Header extends Component {
             <div>
                 <header className="app-header">
                     <FastfoodIcon className="app-logo" fontSize="large" htmlColor="white" />
-                    {this.props.showHeaderSearchBox === true && 
-                    <span className="header-searchbox">
-                        <Input className={classes.searchText}
-                            startAdornment={
-                                <InputAdornment position="start">
-                                    <SearchIcon id="search-icon" htmlColor="white"></SearchIcon>
-                                </InputAdornment>
-                            }
-                            fullWidth={true} placeholder="Search by Restaurant Name" />
-                    </span>
-
+                    {this.props.showHeaderSearchBox === true &&
+                        <span className="header-searchbox">
+                            <Input className={classes.searchText}
+                                startAdornment={
+                                    <InputAdornment position="start">
+                                        <SearchIcon id="search-icon" htmlColor="white"></SearchIcon>
+                                    </InputAdornment>
+                                }
+                                fullWidth={true} placeholder="Search by Restaurant Name" onChange={this.inputSearchChangeHandler} />
+                        </span>
                     }
 
                     {/* Checks for loggedIn if not then displays the login button else profile button */}
