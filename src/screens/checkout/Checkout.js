@@ -3,12 +3,17 @@ import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import StepContent from '@material-ui/core/StepContent';
-import { withStyles, Button, } from '@material-ui/core';
+import { withStyles, Button, Tab, Tabs, IconButton } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
+import GridList from '@material-ui/core/GridList';
+import GridListTile from '@material-ui/core/GridListTile';
+import PropTypes from 'prop-types';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import Paper from '@material-ui/core/Paper';
 
 
 import Header from '../../common/header/Header';
+import '../checkout/Checkout.css'
 
 const styles = (theme => ({
 
@@ -16,17 +21,49 @@ const styles = (theme => ({
         marginBottom: theme.spacing(2),
     },
     button: {
-        marginTop: theme.spacing(1),
+        marginTop: theme.spacing(2),
         marginRight: theme.spacing(1),
     },
     resetContainer: {
         padding: theme.spacing(3),
     },
+    tab: {
+        "font-weight": 500,
+    },
+    gridList: {
+        flexWrap: 'nowrap',
+        // Promote the list into his own layer on Chrome. This cost memory but helps keeping high FPS.
+        transform: 'translateZ(0)',
+    },
+    gridListTile: {
+        textAlign: 'left',
+        margin: '40px 10px 20px 10px',
+        'border-style': 'solid',
+        'border-width': '0.5px 3px 3px 0.5px',
+        'border-color': 'rgb(224,37,96)',
+        'border-radius': '10px',
+        'padding':'8px'
+    },
+    addressCheckButton: {
+        'float': 'right',
+    },
+
+
 
 
 }))
 
+const TabContainer = function (props) {
+    return (
+        <Typography component="div" style={{ padding: '0px', textAlign: 'center' }}>
+            {props.children}
+        </Typography>
+    )
+}
 
+TabContainer.propTypes = {
+    children: PropTypes.node.isRequired
+}
 
 class Checkout extends Component {
     constructor() {
@@ -34,6 +71,7 @@ class Checkout extends Component {
         this.state = {
             activeStep: 0,
             steps: this.getSteps(),
+            value: 0,
 
         }
     }
@@ -65,6 +103,12 @@ class Checkout extends Component {
         });
     }
 
+    tabsChangeHandler = (event, value) => {
+        this.setState({
+            value,
+        });
+    }
+
     render() {
         const { classes } = this.props;
         return (
@@ -77,7 +121,35 @@ class Checkout extends Component {
                                 <Step key={label}>
                                     <StepLabel>{label}</StepLabel>
                                     <StepContent>
-                                        <Typography>dummy Address</Typography>
+                                        {index === 0 &&
+                                            <div className="address-container">
+                                                <Tabs className="address-tabs" value={this.state.value} onChange={this.tabsChangeHandler}>
+                                                    <Tab label="EXISTING ADDRESS" className={classes.tab} />
+                                                    <Tab label="NEW ADDRESS" className={classes.tab} />
+                                                </Tabs>
+                                                {this.state.value === 0 &&
+                                                    <TabContainer>
+                                                        <GridList className={classes.gridList} cols={3} cellHeight='auto'>
+
+                                                            <GridListTile className={classes.gridListTile}>
+                                                                <div className="grid-list-tile-container">
+                                                                <Typography variant="body1" component="p">#546</Typography>
+                                                                <Typography variant="body1" component="p">Amarjyothi Layout,</Typography>
+                                                                <Typography variant="body1" component="p">H.B.C.S. Domlur</Typography>
+                                                                <Typography variant="body1" component="p">Bengaluru</Typography>
+                                                                <Typography variant="body1" component="p">Karnataka</Typography>
+                                                                <Typography variant="body1" component="p">560071</Typography>
+                                                                <IconButton className={classes.addressCheckButton} onClick={this.addressSelectedClickHandler}>
+                                                                    <CheckCircleIcon />
+                                                                </IconButton>
+                                                                </div>
+                                                            </GridListTile>
+
+                                                        </GridList>
+                                                    </TabContainer>
+                                                }
+                                            </div>
+                                        }
                                         <div className={classes.actionsContainer}>
                                             <div>
                                                 <Button
@@ -86,7 +158,7 @@ class Checkout extends Component {
                                                     className={classes.Button}
                                                 >
                                                     Back
-                                        </Button>
+                                                </Button>
                                                 <Button
                                                     variant="contained"
                                                     color="primary"
