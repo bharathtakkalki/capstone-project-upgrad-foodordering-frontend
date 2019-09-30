@@ -180,7 +180,7 @@ class Checkout extends Component {
             snackBarOpen: false,
             snackBarMessage: "",
             transition: Fade,
-            isLoggedIn:sessionStorage.getItem('access-token') === null? true:false,
+            isLoggedIn: sessionStorage.getItem('access-token') === null ? false : true,
         }
 
 
@@ -246,9 +246,10 @@ class Checkout extends Component {
     //This method call get all address,get all states and get all payment endpoints.
     //Then re-renders the page with the data received from the api
     componentDidMount() {
+        if (this.state.isLoggedIn) {
+          //Calling getAllAddress function to get all the address of the customer.
+            this.getAllAddress();
 
-        //Calling getAllAddress function to get all the address of the customer.
-        this.getAllAddress();
 
         //API call to get all states 
         let statesData = null;
@@ -263,10 +264,6 @@ class Checkout extends Component {
                 })
             }
         })
-
-        xhrStates.open('GET', this.props.baseUrl + 'states');
-        xhrStates.send(statesData);
-
         //API call to get all payment methods 
         let paymentData = null;
         let xhrPayment = new XMLHttpRequest();
@@ -279,10 +276,11 @@ class Checkout extends Component {
                 })
             }
         })
-
-        xhrPayment.open('GET', this.props.baseUrl + 'payment');
-        xhrPayment.send(paymentData);
+            xhrPayment.open('GET', this.props.baseUrl + 'payment');
+            xhrPayment.send(paymentData);
+        }
     }
+
 
     // This method calls the getAllAddress of customer endpoint 
     //Updates the page with all the address of the customer
@@ -532,14 +530,14 @@ class Checkout extends Component {
                     let responseOrder = JSON.parse(xhrOrder.responseText)
                     that.setState({
                         ...that.state,
-                        snackBarOpen:true,
-                        snackBarMessage:"Order placed successfully! Your order ID is "+responseOrder.id,
+                        snackBarOpen: true,
+                        snackBarMessage: "Order placed successfully! Your order ID is " + responseOrder.id,
                     });
-                }else{
+                } else {
                     that.setState({
                         ...that.state,
-                        snackBarOpen:true,
-                        snackBarMessage:"Unable to place your order! Please try again!",
+                        snackBarOpen: true,
+                        snackBarMessage: "Unable to place your order! Please try again!",
                     });
                 }
             }
@@ -610,9 +608,15 @@ class Checkout extends Component {
 
     //This method is called every time the page is rendered to check if the customer is logged in if not then redirected to the home page. 
     redirectToHome = () => {
-        if (this.state.isLoggedIn) {
-           return <Redirect to = "/"/>
+        if (!this.state.isLoggedIn) {
+            return <Redirect to="/" />
         }
+    }
+    afterLogoutRedirectToHome = () => {
+        this.setState({
+            ...this.state,
+            isLoggedIn: false,
+        })
     }
 
     

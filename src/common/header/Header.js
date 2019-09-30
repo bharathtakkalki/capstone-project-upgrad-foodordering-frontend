@@ -117,7 +117,8 @@ class Header extends Component {
             snackBarOpen: false,
             snackBarMessage: "",
             transition: Fade,
-            loggedIn: false,
+            loggedIn: sessionStorage.getItem('access-token') === null ? false : true,
+            loggedInName:sessionStorage.getItem('customer-name'),
 
         }
 
@@ -254,10 +255,11 @@ class Header extends Component {
                         let loginResponse = JSON.parse(this.responseText);
                         sessionStorage.setItem("uuid", JSON.parse(this.responseText).id);
                         sessionStorage.setItem("access-token", xhrLogin.getResponseHeader("access-token"));
+                        sessionStorage.setItem("customer-name",loginResponse.first_name);
                         that.setState({
                             ...that.state,
                             loggedIn: true,
-                            firstName: loginResponse.first_name,
+                            loggedInName: loginResponse.first_name,
                             snackBarMessage: "Logged in successfully!",
                             snackBarOpen: true,
                         })
@@ -475,6 +477,35 @@ class Header extends Component {
         })
     }
 
+    onLogOutClickHandler = () => {
+        let logoutData = null;
+        let that = this
+        let xhrLogout = new XMLHttpRequest();
+        xhrLogout.addEventListener("readystatechange",function(){
+            if(xhrLogout.readyState === 4 && xhrLogout.status === 200){
+                sessionStorage.removeItem("uuid"); //Clearing access-token
+                sessionStorage.removeItem("access-token"); //Clearing access-token
+                sessionStorage.removeItem("customer-name"); //Clearing access-token
+                that.setState({
+                    ...that.state,
+                    loggedIn:false,
+                    menuIsOpen: !that.state.menuIsOpen,
+                });
+
+                if(that.props.logoutRedirect){
+                    that.props.logoutRedirect();
+                }
+            }
+          
+        })
+
+        xhrLogout.open('POST',this.props.baseUrl+'customer/logout');
+        xhrLogout.setRequestHeader('authorization','Bearer '+sessionStorage.getItem('access-token'));
+        xhrLogout.send(logoutData);
+       
+
+    }
+
     render() {
         // Styles are stored in the const classes
         const { classes } = this.props;
@@ -504,7 +535,7 @@ class Header extends Component {
                         </Button>
                         : <Button className={classes.profileButton} size="large" variant="text" onClick={this.profileButtonClickHandler}>
                             <AccountCircle className="profile-button-icon" htmlColor="#c2c2c2" />
-                            {this.state.firstName}
+                            {this.state.loggedInName}
                         </Button>
                     }
                     <Menu id="profile-menu" anchorEl={this.state.anchorEl} open={this.state.menuIsOpen} onClose={this.profileButtonClickHandler}>
@@ -512,7 +543,7 @@ class Header extends Component {
                             <Link to={"/profile"} className={classes.menuItems} underline="none" color={"default"}>
                                 <MenuItem className={classes.menuItems} onClick={this.onMyProfileClicked} disableGutters={false}>My profile</MenuItem>
                             </Link>
-                            <MenuItem className="menu-items" onClick={this.onLogOutClicked}>Logout</MenuItem>
+                            <MenuItem className="menu-items" onClick={this.onLogOutClickHandler}>Logout</MenuItem>
                         </MenuList>
                     </Menu>
                 </header>
