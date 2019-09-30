@@ -16,7 +16,7 @@
         text-align: center;
     }
     .restaurant-avg-cost-container{
-        margin-left: 50px;
+        margin-left: auto;
     }
     .restaurant-rating{
         align-self: center;
@@ -29,7 +29,7 @@
 
 }
 
-/* Style for the container containing rating adn cost   */
+/* Style for the container containing rating and cost   */
 .restaurant-rating-cost-container{
     display: flex;
     align-items: center;
@@ -41,6 +41,11 @@
         margin-left: 75px;
         width: 100%;
     }
+}
+.restaurant-avg-cost-container{
+    display: flex;
+    flex-direction: column;
+    margin-left: auto;
 }
 
 /* Style for the restaurant rating */
@@ -62,11 +67,9 @@
     flex-direction: column;
 }
 /* Responsive code for the smaller screen size */
-@media screen and (min-width:600px){
+@media screen and (min-width:1000px){
     .restaurant-avg-cost-container{
-        display: flex;
-        flex-direction: column;
-     margin-left: 350px;
+        margin-left: 350px;
     }
 }
 
