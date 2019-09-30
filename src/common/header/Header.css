@@ -1,0 +1,70 @@
+.app-header{
+    display: flex;
+    height: 40px;
+    background-color:rgb(37, 50,56);
+    padding: 10px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.app-logo{
+    padding-left: 10px;
+    align-self: center;
+}
+@media screen and (max-width:600px){
+    .app-header{
+        flex-direction: column;
+        height: 140px;
+        align-items: flex-start;
+        justify-content:space-between;
+    }
+    .app-logo{
+        align-self:flex-start;
+    }
+}
+
+.header-searchbox{
+    display: flex;
+    /* align-self: center; */
+    align-items: center;
+    /* justify-content: center; */
+    width: 300px;
+    align-self: flex-start;
+    height: 40px;
+}
+
+#search-icon{
+    height: 27px;
+    padding: 0px 0px 0px 10px;
+}
+
+.login-button-icon{
+    padding-right: 10px;
+}
+.profile-button-icon{
+    padding-right: 10px;
+}
+
+.login-modal-tabs {
+    margin-bottom: 20px;
+}
+
+.dispNone {
+    display: none;
+}
+
+.dispBlock {
+    display: block;
+}
+
+.red {
+    color: red;
+}
+
+/* style for the menu when clicked on profile_picture */
+#profile-menu{
+    margin-top: 30px;
+    padding: 0px;
+    margin-left: 20px;
+}
+
