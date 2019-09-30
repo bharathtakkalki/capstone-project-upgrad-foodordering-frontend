@@ -33,6 +33,8 @@ const styles = (theme => ({
     },
     loginButton: { //Style for Login Button
         "font-weight": 400,
+        "margin":"8px 8px 8px 8px"
+
     },
     formButton: { //Style for the Form Buttons
         "font-weight": 400,
@@ -47,6 +49,7 @@ const styles = (theme => ({
         color: "#c2c2c2",
         "text-transform": "none",
         "font-weight": 400,
+        "padding":"8px 8px 8px 8px",
     },
     menuItems: {  //Style for the menu items 
         "text-decoration": "none",
@@ -131,6 +134,10 @@ class Header extends Component {
             ...this.state,
             isModalOpen: false
         })
+        //Changing badge visibility in the details page if login clicked in details page
+        if(this.props.changeBadgeVisibility){
+            this.props.changeBadgeVisibility();
+        }
     }
 
     //This method is called when the login button in the header is clicked.
@@ -161,6 +168,10 @@ class Header extends Component {
             contactNoRegistered: "dispNone",
             contactHelpText: "dispNone",
         })
+        //Changing badge visibility in the details page if login clicked in details page
+        if(this.props.changeBadgeVisibility){
+            this.props.changeBadgeVisibility();
+        }
     }
 
     //This method is called to open and close the menu
@@ -232,15 +243,14 @@ class Header extends Component {
         })
     }
     
+     //This method is called when the input in Search Box is changed.
+     //This in turn calls the function updateSearchRestaurant in the home page to update the searched restaurant list.
     inputSearchChangeHandler = (event) => {
         let searchOn = true
         if (! (event.target.value === "")) {
             let dataRestaurant = null;
             let that = this
             let xhrSearchRestaurant = new XMLHttpRequest();
-
-
-            console.log(event.target.value)
 
             xhrSearchRestaurant.addEventListener("readystatechange", function () {
                 if (xhrSearchRestaurant.readyState === 4 && xhrSearchRestaurant.status === 200) {
@@ -508,15 +518,18 @@ class Header extends Component {
         })
     }
 
+    // This method is called when the customer clicks log out from the profile menu
+    //This method inturn uses logout endpoint to log out the customer
+    //Also while log out clears all the session data
     onLogOutClickHandler = () => {
         let logoutData = null;
         let that = this
         let xhrLogout = new XMLHttpRequest();
         xhrLogout.addEventListener("readystatechange", function () {
             if (xhrLogout.readyState === 4 && xhrLogout.status === 200) {
-                sessionStorage.removeItem("uuid"); //Clearing access-token
+                sessionStorage.removeItem("uuid"); //Clearing uuid
                 sessionStorage.removeItem("access-token"); //Clearing access-token
-                sessionStorage.removeItem("customer-name"); //Clearing access-token
+                sessionStorage.removeItem("customer-name"); //Clearing customer-name
                 that.setState({
                     ...that.state,
                     loggedIn: false,

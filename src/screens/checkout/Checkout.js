@@ -40,7 +40,10 @@ const styles = (theme => ({
         marginRight: theme.spacing(1),
     },
     stepper: { //Style for the stepper
-        'padding-top': '0px'
+        'padding-top': '0px',
+        '@media (max-width:600px)': {
+            'padding':'0px',
+        }
     },
     resetContainer: { // Style for the reset container
         padding: theme.spacing(3),
@@ -65,10 +68,6 @@ const styles = (theme => ({
         'border-width': '0.5px 3px 3px 0.5px',
         'border-radius': '10px',
         'padding': '8px',
-        '@media(max-width:600px)': {
-            width: '50%',
-        }
-
     },
     addressCheckButton: { // Style fro the address check button
         'float': 'right',
@@ -108,7 +107,8 @@ const styles = (theme => ({
         color: 'grey'
     },
     itemQuantity: { // Style for the Item quantity 
-        'margin-left': '10%',
+        'margin-left': 'auto',
+        'margin-right':'30px',
         color: 'grey'
     },
     placeOrderButton: { //Style for the Place order button in the order card
@@ -118,12 +118,12 @@ const styles = (theme => ({
         'margin': '10px 0px'
     },
     couponInput: {// Style for the input coupon
-        'width': '150px',
+        'width': '200px',
         '@media(min-width:1300px)': {
-            width: '200px',
+            width: '250px',
         },
         '@media(max-width:600px)': {
-            width: '250px',
+            width: '200px',
         }
     },
     applyButton: { //Style for the apply button
@@ -180,6 +180,7 @@ class Checkout extends Component {
             snackBarOpen: false,
             snackBarMessage: "",
             transition: Fade,
+            noOfColumn:3,
             isLoggedIn: sessionStorage.getItem('access-token') === null ? false : true,
         }
 
@@ -204,6 +205,17 @@ class Checkout extends Component {
                     ...this.state,
                     snackBarOpen: true,
                     snackBarMessage: "Select Address"
+                })
+            }
+        }
+        if(this.state.activeStep === 1){
+            if(this.state.selectedPayment === ""){
+                let activeStep = this.state.activeStep;
+                this.setState({
+                    ...this.state,
+                    activeStep:activeStep,
+                    snackBarOpen: true,
+                    snackBarMessage:"Select Payment",
                 })
             }
         }
@@ -251,34 +263,45 @@ class Checkout extends Component {
             this.getAllAddress();
 
 
-        //API call to get all states 
-        let statesData = null;
-        let xhrStates = new XMLHttpRequest();
-        let that = this;
-        xhrStates.addEventListener("readystatechange", function () {
-            if (xhrStates.readyState === 4 && xhrStates.status === 200) {
-                let states = JSON.parse(xhrStates.responseText).states;
-                that.setState({
-                    ...that.state,
-                    states: states,
-                })
-            }
-        })
-        //API call to get all payment methods 
-        let paymentData = null;
-        let xhrPayment = new XMLHttpRequest();
-        xhrPayment.addEventListener("readystatechange", function () {
-            if (xhrPayment.readyState === 4 && xhrPayment.status === 200) {
-                let payment = JSON.parse(xhrPayment.responseText).paymentMethods;
-                that.setState({
-                    ...that.state,
-                    payment: payment,
-                })
-            }
-        })
+             //API call to get all states 
+            let statesData = null;
+            let xhrStates = new XMLHttpRequest();
+            let that = this;
+            xhrStates.addEventListener("readystatechange", function () {
+                if (xhrStates.readyState === 4 && xhrStates.status === 200) {
+                    let states = JSON.parse(xhrStates.responseText).states;
+                    that.setState({
+                        ...that.state,
+                        states: states,
+                    })
+                }
+            })
+            xhrStates.open('GET', this.props.baseUrl + 'states');
+            xhrStates.send(statesData);
+
+
+            //API call to get all payment methods 
+            let paymentData = null;
+            let xhrPayment = new XMLHttpRequest();
+            xhrPayment.addEventListener("readystatechange", function () {
+                if (xhrPayment.readyState === 4 && xhrPayment.status === 200) {
+                    let payment = JSON.parse(xhrPayment.responseText).paymentMethods;
+                    that.setState({
+                        ...that.state,
+                        payment: payment,
+                    })
+                }
+            })
             xhrPayment.open('GET', this.props.baseUrl + 'payment');
             xhrPayment.send(paymentData);
+
+            window.addEventListener('resize', this.getGridListColumn); //Adding a event listening on the  to change the no of columns for the grid.
         }
+    }
+
+    //This Method will be called when the components are unmounted so as to withdraw all the asynchronous function running. 
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.updateCardsGridListCols);// Removing event listener.
     }
 
 
@@ -317,6 +340,22 @@ class Checkout extends Component {
         xhrAddress.send(data);
 
     }
+
+    // Updates the column no as per the screen size.
+    getGridListColumn = () => {
+        if (window.innerWidth <= 600) {
+            this.setState({ 
+                ...this.state,
+                noOfColumn: 2 
+            });
+        }else{
+            this.setState({ 
+                ...this.state,
+                noOfColumn: 3 
+            });
+        }
+    }
+
 
     // This method is called when the save address button is clicked from the address form 
     //This method uses save address endpoint and sends the data as required by the endpoint to be persisted in the data base.
@@ -516,7 +555,7 @@ class Checkout extends Component {
         let newOrderData = JSON.stringify({ //Creating the data as required.
             "address_id": this.state.selectedAddress,
             "bill": Math.floor(Math.random() * 100),
-            "coupon_id": this.state.coupon.id ? this.state.coupon.id : null,
+            "coupon_id": this.state.coupon !== null ? this.state.coupon.id : "",
             "discount": this.getDiscountAmount(),
             "item_quantities": item_quantities,
             "payment_id": this.state.selectedPayment,
@@ -612,7 +651,7 @@ class Checkout extends Component {
             return <Redirect to="/" />
         }
     }
-    afterLogoutRedirectToHome = () => {
+    logoutRedirectToHome = () => {
         this.setState({
             ...this.state,
             isLoggedIn: false,
@@ -628,7 +667,7 @@ class Checkout extends Component {
                 
                 {this.redirectToHome() /*This method is called to check if logged in or not else redirected to home.*/}
                 {/*Rendering Header and passing parameter showHeaderSearchBox as false to remove the search box. */}
-                <Header baseUrl={this.props.baseUrl} showHeaderSearchBox={false} />
+                <Header baseUrl={this.props.baseUrl} showHeaderSearchBox={false} logoutRedirect={this.logoutRedirectToHome}/>
                 <div className="checkout-container">
                     <div className="stepper-container">
                         <Stepper activeStep={this.state.activeStep} orientation="vertical" className={classes.stepper}>
@@ -645,7 +684,7 @@ class Checkout extends Component {
                                                 {this.state.value === 0 && //Based on the value showing the tab value = 0 for existing address
                                                     <TabContainer>
                                                         {this.state.addresses.length !== 0 ?
-                                                            <GridList className={classes.gridList} cols={3} spacing={2} cellHeight='auto'>
+                                                            <GridList className={classes.gridList} cols={this.state.noOfColumn} spacing={2} cellHeight='auto'>
                                                                 {this.state.addresses.map(address => (
                                                                     <GridListTile className={classes.gridListTile} key={address.id} style={{ borderColor: address.selected ? "rgb(224,37,96)" : "white" }}>
                                                                         <div className="grid-list-tile-container">

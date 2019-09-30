@@ -106,6 +106,7 @@ class Details extends Component {
             snackBarOpen: false,
             snackBarMessage: "",
             transition: Fade,
+            badgeVisible:false,
         }
     }
 
@@ -300,14 +301,23 @@ class Details extends Component {
         })
     }
 
+    //this method changes the visibility of badge when the modal is open in the details page.
+    changeBadgeVisibility = () => {
+        this.setState({
+            ...this.state,
+            badgeVisible:!this.state.badgeVisible,
+        })
+    }
+
 render() {
     // Styles are stored in the const classes
     const { classes } = this.props;
     return (
 
         <div>
-            {/* Rendering the header and passing the parameter showHeaderSearchBox as false to not render the searchBox. */}
-            <Header baseUrl={this.props.baseUrl} showHeaderSearchBox={false}></Header>
+            {/* Rendering the header and passing the parameter showHeaderSearchBox as false to not render the searchBox 
+            also changeBadgeVisibility function is passed to change the visibility when the modal is open. */}
+            <Header baseUrl={this.props.baseUrl} showHeaderSearchBox={false} changeBadgeVisibility = {this.changeBadgeVisibility}></Header>
             {/* Restaurant Details Container */}
             <div className="restaurant-details-container">
                 <div>
@@ -367,7 +377,7 @@ render() {
                         <CardHeader
                             avatar={
                                 <Avatar aria-label="shopping-cart" className={classes.shoppingCart}>
-                                    <Badge badgeContent={this.state.cartItems.length} color="primary" showZero = {true}  className={classes.badge}>
+                                    <Badge badgeContent={this.state.cartItems.length} color="primary" showZero = {true} invisible={this.state.badgeVisible} className={classes.badge}>
                                         <ShoppingCartIcon />
                                     </Badge>
                                 </Avatar>

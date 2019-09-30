@@ -1,7 +1,6 @@
 /* Style for the header  */
 .app-header{
     display: flex;
-    height: 40px;
     background-color:rgb(37, 50,56);
     padding: 10px;
     align-items: center;
@@ -18,7 +17,6 @@
 @media screen and (max-width:600px){
     .app-header{
         flex-direction: column;
-        height: 140px;
         align-items: flex-start;
         justify-content:space-between;
     }
