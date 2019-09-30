@@ -29,35 +29,36 @@ import 'font-awesome/css/font-awesome.min.css';
 import Header from '../../common/header/Header';
 import '../checkout/Checkout.css'
 
+// Custom Styles to over ride material ui default styles
 const styles = (theme => ({
 
-    actionsContainer: {
+    actionsContainer: { //Style for the action container in the stepper
         marginBottom: theme.spacing(2),
     },
-    button: {
+    button: { //style for the button in the stepper
         marginTop: theme.spacing(2),
         marginRight: theme.spacing(1),
     },
-    stepper: {
+    stepper: { //Style for the stepper
         'padding-top': '0px'
     },
-    resetContainer: {
+    resetContainer: { // Style for the reset container
         padding: theme.spacing(3),
     },
-    tab: {
+    tab: { //Style for the tab
         "font-weight": 500,
         '@media (max-width:600px)': {
             width: '50%',
         }
     },
-    gridList: {
+    gridList: { //Style for the Grid List 
         flexWrap: 'nowrap',
         // Promote the list into his own layer on Chrome. This cost memory but helps keeping high FPS.
         transform: 'translateZ(0)',
 
 
     },
-    gridListTile: {
+    gridListTile: { //Style for the Grid list tile .
         textAlign: 'left',
         margin: '30px 0px 20px 0px',
         'border-style': 'solid',
@@ -69,54 +70,54 @@ const styles = (theme => ({
         }
 
     },
-    addressCheckButton: {
+    addressCheckButton: { // Style fro the address check button
         'float': 'right',
     },
-    saveAddressForm: {
+    saveAddressForm: { //Style for the save address form 
         width: '60%',
         'padding': '20px',
         textAlign: 'left',
 
     },
-    selectField: {
+    selectField: { //Style for the select field
         width: '100%',
     },
-    formControl: {
+    formControl: { //Style for the formcontrol
         width: '200px',
     },
-    formButton: {
+    formButton: { // Style for the button in the form
         'font-weight': 400,
         'width': '150px'
     },
-    cardContent: {
+    cardContent: { //Style for the Order summary card content 
         'padding-top': '0px',
         'margin-left': '10px',
         'margin-right': '10px'
     },
-    summaryHeader: {
+    summaryHeader: { //Style for the summary heading 
         'margin-left': '10px',
         'margin-right': '10px'
     },
-    restaurantName: {
+    restaurantName: { //Style for the restaurant name
         'font-size': '18px',
         'color': 'rgb(85,85,85)',
         margin: '10px 0px 10px 0px'
     },
-    menuItemName: {
+    menuItemName: { //Style for the menu item in the summary card
         'margin-left': '10px',
         color: 'grey'
     },
-    itemQuantity: {
+    itemQuantity: { // Style for the Item quantity 
         'margin-left': '10%',
         color: 'grey'
     },
-    placeOrderButton: {
+    placeOrderButton: { //Style for the Place order button in the order card
         'font-weight': '400'
     },
-    divider: {
+    divider: { //Style for the divider 
         'margin': '10px 0px'
     },
-    couponInput: {
+    couponInput: {// Style for the input coupon
         'width': '150px',
         '@media(min-width:1300px)': {
             width: '200px',
@@ -125,12 +126,13 @@ const styles = (theme => ({
             width: '250px',
         }
     },
-    applyButton: {
+    applyButton: { //Style for the apply button
         height: '40px'
-    }
+    },
 
 }))
 
+// Custom component created for the use in the tab
 const TabContainer = function (props) {
     return (
         <Typography className={props.className} component="div">
@@ -142,6 +144,8 @@ const TabContainer = function (props) {
 TabContainer.propTypes = {
     children: PropTypes.node.isRequired
 }
+
+// Creating Checkout  class component to render the Checkout page as per the design
 
 class Checkout extends Component {
     constructor(props) {
@@ -167,8 +171,8 @@ class Checkout extends Component {
             states: [],
             selectedPayment: "",
             payment: [],
-            cartItems: props.location.cartItems,
-            restaurantDetails: props.location.restaurantDetails,
+            cartItems: props.location.cartItems ? props.location.cartItems : [] ,//Setting state with details passed from the previous page
+            restaurantDetails: props.location.restaurantDetails ? props.location.restaurantDetails : {name:null}, //Setting state with details passed from the previous page
             coupon: null,
             couponName: "",
             couponNameRequired: "dispNone",
@@ -178,11 +182,14 @@ class Checkout extends Component {
             transition: Fade,
             isLoggedIn:sessionStorage.getItem('access-token') === null? true:false,
         }
-    }
 
+
+    }
+    //This method is called to get the array of steps name.
     getSteps = () => {
         return ['Delivery', 'Payment'];
     }
+    //This method is called when next button is clicked in the stepper.
     nextButtonClickHandler = () => {
         if (this.state.value === 0) {
             if (this.state.selectedAddress !== "") {
@@ -202,6 +209,7 @@ class Checkout extends Component {
         }
     }
 
+    //This method is called when back button is clicked in the stepper
     backButtonClickHandler = () => {
         let activeStep = this.state.activeStep;
         activeStep--;
@@ -211,6 +219,7 @@ class Checkout extends Component {
         });
     }
 
+    //This method is called when the change button in the stepper is called
     changeButtonClickHandler = () => {
         this.setState({
             ...this.state,
@@ -218,12 +227,14 @@ class Checkout extends Component {
         });
     }
 
+    //This method handles change in the tabs.
     tabsChangeHandler = (event, value) => {
         this.setState({
             value,
         });
     }
 
+    //This is called when a radio button is selected  in the payment
     radioChangeHandler = (event) => {
         this.setState({
             ...this.state,
@@ -231,10 +242,15 @@ class Checkout extends Component {
         })
     }
 
+    //This method is called when the components are mounted and in turn calls the api.
+    //This method call get all address,get all states and get all payment endpoints.
+    //Then re-renders the page with the data received from the api
     componentDidMount() {
 
+        //Calling getAllAddress function to get all the address of the customer.
         this.getAllAddress();
 
+        //API call to get all states 
         let statesData = null;
         let xhrStates = new XMLHttpRequest();
         let that = this;
@@ -251,6 +267,7 @@ class Checkout extends Component {
         xhrStates.open('GET', this.props.baseUrl + 'states');
         xhrStates.send(statesData);
 
+        //API call to get all payment methods 
         let paymentData = null;
         let xhrPayment = new XMLHttpRequest();
         xhrPayment.addEventListener("readystatechange", function () {
@@ -267,6 +284,8 @@ class Checkout extends Component {
         xhrPayment.send(paymentData);
     }
 
+    // This method calls the getAllAddress of customer endpoint 
+    //Updates the page with all the address of the customer
     getAllAddress = () => {
         let data = null;
         let that = this;
@@ -300,9 +319,12 @@ class Checkout extends Component {
         xhrAddress.send(data);
 
     }
+
+    // This method is called when the save address button is clicked from the address form 
+    //This method uses save address endpoint and sends the data as required by the endpoint to be persisted in the data base.
     saveAddressClickHandler = () => {
-        if (this.saveAddressFormValid()) {
-            let newAddressData = JSON.stringify({
+        if (this.saveAddressFormValid()) { //checking the form validity is right only then the api call is made
+            let newAddressData = JSON.stringify({ //Creating data of address to be sent to the end point.
                 "city": this.state.city,
                 "flat_building_name": this.state.flatBuildingName,
                 "locality": this.state.locality,
@@ -320,7 +342,7 @@ class Checkout extends Component {
                         value: 0,
 
                     })
-                    that.getAllAddress();
+                    that.getAllAddress(); //Updating the page by calling get all address
                 }
             })
 
@@ -331,6 +353,8 @@ class Checkout extends Component {
         }
     }
 
+    //This method checks the validity of the form submitted.
+    //This method return true if form is all right else displays relevant msg.
     saveAddressFormValid = () => {
         let flatBuildingNameRequired = "dispNone";
         let cityRequired = "dispNone";
@@ -340,33 +364,33 @@ class Checkout extends Component {
         let pincodeHelpText = "dispNone";
         let saveAddressFormValid = true;
 
-        if (this.state.flatBuildingName === "") {
+        if (this.state.flatBuildingName === "") { //checking if the flatBuildingName is not empty
             flatBuildingNameRequired = "dispBlock";
             saveAddressFormValid = false;
         }
 
-        if (this.state.locality === "") {
+        if (this.state.locality === "") { //checking if the locality is not empty
             localityRequired = "dispBlock";
             saveAddressFormValid = false;
         }
 
-        if (this.state.selectedState === "") {
+        if (this.state.selectedState === "") { //checking if the selectedState is not empty
             stateRequired = "dispBlock";
             saveAddressFormValid = false;
         }
 
-        if (this.state.city === "") {
+        if (this.state.city === "") { //checking if the city is not empty
             cityRequired = "dispBlock";
             saveAddressFormValid = false;
         }
 
-        if (this.state.pincode === "") {
+        if (this.state.pincode === "") { //checking if the pincode is not empty
             pincodeRequired = "dispBlock";
             saveAddressFormValid = false;
         }
         if (this.state.pincode !== "") {
             var pincodePattern = /^\d{6}$/;
-            if (!this.state.pincode.match(pincodePattern)) {
+            if (!this.state.pincode.match(pincodePattern)) {  //checking the format of the pincode
                 pincodeHelpText = "dispBlock";
                 saveAddressFormValid = false;
             }
@@ -384,44 +408,55 @@ class Checkout extends Component {
         return saveAddressFormValid
     }
 
-
+    //This method handles change in the input of FlatBuildingNameChangeHandler
     inputFlatBuildingNameChangeHandler = (event) => {
         this.setState({
             ...this.state,
             flatBuildingName: event.target.value,
         })
     }
+
+    //This method handles change in the input of locality
     inputLocalityChangeHandler = (event) => {
         this.setState({
             ...this.state,
             locality: event.target.value,
         })
     }
+
+    //This method handles change in the input of city
     inputCityChangeHandler = (event) => {
         this.setState({
             ...this.state,
             city: event.target.value,
         })
     }
+
+    //This method handles change in the input of state
     selectSelectedStateChangeHandler = (event) => {
         this.setState({
             ...this.state,
             selectedState: event.target.value,
         })
     }
+
+    //This method handles change in the input of pincode
     inputPincodeChangeHandler = (event) => {
         this.setState({
             ...this.state,
             pincode: event.target.value,
         })
     }
-
+    
+    //This method handles change in the input of coupon name
     inputCouponNameChangeHandler = (event) => {
         this.setState({
             ...this.state,
             couponName: event.target.value,
         })
     }
+    //This method handles the click on the apply button & calls the api to get coupon by name.
+    //If the coupon is invalid it will display invalid or else it will apply the coupon.
     applyButtonClickHandler = () => {
         let isCouponNameValid = true;
         let couponNameRequired = "dispNone";
@@ -435,6 +470,7 @@ class Checkout extends Component {
             })
         }
 
+        //Api is called only when the data entered is right.
         if (isCouponNameValid) {
             let couponData = null;
             let that = this;
@@ -467,6 +503,9 @@ class Checkout extends Component {
     }
 
 
+    // This method is called when the placeOrderButton is Clicked.
+    //This method calls the save order endpoint to save the order that has been created and returns with a order placed msg and id.
+    //If the API call is successfull relevant msg is shown in the snackbar other wise error msg is shown.
     placeOrderButtonClickHandler = () => {
         let item_quantities = [];
         this.state.cartItems.forEach(cartItem => {
@@ -476,10 +515,10 @@ class Checkout extends Component {
                 'quantity': cartItem.quantity,
             });
         })
-        let newOrderData = JSON.stringify({
+        let newOrderData = JSON.stringify({ //Creating the data as required.
             "address_id": this.state.selectedAddress,
             "bill": Math.floor(Math.random() * 100),
-            "coupon_id": this.state.coupon.id,
+            "coupon_id": this.state.coupon.id ? this.state.coupon.id : null,
             "discount": this.getDiscountAmount(),
             "item_quantities": item_quantities,
             "payment_id": this.state.selectedPayment,
@@ -512,6 +551,8 @@ class Checkout extends Component {
     }
 
 
+
+    // This Method is called when the address is selected from the existing address tab
     addressSelectedClickHandler = (addressId) => {
         let addresses = this.state.addresses;
         let selectedAddress = "";
@@ -529,6 +570,8 @@ class Checkout extends Component {
             selectedAddress: selectedAddress
         })
     }
+
+    //This method returns Subtotal.
     getSubTotal = () => {
         let subTotal = 0;
         this.state.cartItems.forEach(cartItem => {
@@ -537,6 +580,7 @@ class Checkout extends Component {
         return subTotal;
     }
 
+    //This Method returns discount amount if applied.
     getDiscountAmount = () => {
         let discountAmount = 0;
         if (this.state.coupon !== null) {
@@ -545,11 +589,14 @@ class Checkout extends Component {
         }
         return discountAmount;
     }
+
+    //This method returns net amount.
     getNetAmount = () => {
         let netAmount = this.getSubTotal() - this.getDiscountAmount();
         return netAmount;
     }
 
+    //This method handles the snackbar close call
     snackBarClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
@@ -560,22 +607,28 @@ class Checkout extends Component {
             snackBarOpen: false,
         })
     }
+
+    //This method is called every time the page is rendered to check if the customer is logged in if not then redirected to the home page. 
     redirectToHome = () => {
         if (this.state.isLoggedIn) {
            return <Redirect to = "/"/>
         }
     }
 
+    
+    
     render() {
         const { classes } = this.props;
         return (
             <div>
-                {this.redirectToHome()}
+                
+                {this.redirectToHome() /*This method is called to check if logged in or not else redirected to home.*/}
+                {/*Rendering Header and passing parameter showHeaderSearchBox as false to remove the search box. */}
                 <Header baseUrl={this.props.baseUrl} showHeaderSearchBox={false} />
                 <div className="checkout-container">
                     <div className="stepper-container">
                         <Stepper activeStep={this.state.activeStep} orientation="vertical" className={classes.stepper}>
-                            {this.state.steps.map((label, index) => (
+                            {this.state.steps.map((label, index) => ( //Iteration over each step to create a stepper
                                 <Step key={label}>
                                     <StepLabel>{label}</StepLabel>
                                     <StepContent>
@@ -585,7 +638,7 @@ class Checkout extends Component {
                                                     <Tab label="EXISTING ADDRESS" className={classes.tab} />
                                                     <Tab label="NEW ADDRESS" className={classes.tab} />
                                                 </Tabs>
-                                                {this.state.value === 0 &&
+                                                {this.state.value === 0 && //Based on the value showing the tab value = 0 for existing address
                                                     <TabContainer>
                                                         {this.state.addresses.length !== 0 ?
                                                             <GridList className={classes.gridList} cols={3} spacing={2} cellHeight='auto'>
@@ -609,7 +662,7 @@ class Checkout extends Component {
                                                         }
                                                     </TabContainer>
                                                 }
-                                                {this.state.value === 1 &&
+                                                {this.state.value === 1 && //Value = 1 for save address tab
                                                     <TabContainer className={classes.saveAddressForm}>
                                                         <FormControl required className={classes.formControl}>
                                                             <InputLabel htmlFor="flat-building-name">Flat / Building No.</InputLabel>
