@@ -3,7 +3,7 @@ import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import StepContent from '@material-ui/core/StepContent';
-import { withStyles, Button, Tab, Tabs, IconButton } from '@material-ui/core';
+import { withStyles, Button, Tab, Tabs, IconButton, FormLabel, RadioGroup, FormControlLabel, Radio } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import Input from '@material-ui/core/Input';
 import { FormControl, InputLabel, FormHelperText } from '@material-ui/core';
@@ -37,7 +37,7 @@ const styles = (theme => ({
     gridList: {
         flexWrap: 'nowrap',
         // Promote the list into his own layer on Chrome. This cost memory but helps keeping high FPS.
-        //transform: 'translateZ(0)',
+        transform: 'translateZ(0)',
     },
     gridListTile: {
         textAlign: 'left',
@@ -101,6 +101,9 @@ class Checkout extends Component {
             pincodeRequired: "dispNone",
             pincodeHelpText: "dispNone",
             states: [],
+            selectedPayment:"",
+            selectedPaymentId:"",
+            payment:['COD','Online Payment']
 
 
         }
@@ -141,6 +144,13 @@ class Checkout extends Component {
         this.setState({
             value,
         });
+    }
+
+    radioChangeHandler = (event) => {
+        this.setState({
+            ...this.state,
+            selectedPayment:event.target.value,
+        })
     }
 
     componentDidMount() {
@@ -341,7 +351,7 @@ class Checkout extends Component {
                                 <Step key={label}>
                                     <StepLabel>{label}</StepLabel>
                                     <StepContent>
-                                        {index === 0 &&
+                                        {index === 0 ?
                                             <div className="address-container">
                                                 <Tabs className="address-tabs" value={this.state.value} onChange={this.tabsChangeHandler}>
                                                     <Tab label="EXISTING ADDRESS" className={classes.tab} />
@@ -430,7 +440,23 @@ class Checkout extends Component {
                                                     </TabContainer>
                                                 }
                                             </div>
+                                            :
+                                            <div className="payment-container">
+                                                <FormControl component="fieldset" className={classes.radioFormControl}>
+                                                    <FormLabel component="legend">
+                                                        Select Mode of Payment
+                                                    </FormLabel>
+                                                    <RadioGroup aria-label="payment" name="payment" value={this.state.selectedPayment} onChange = {this.radioChangeHandler}>
+                                                        {this.state.payment.map((label,index) => (
+                                                            <FormControlLabel value={label} control={<Radio/>} label={label} />
+                                                        ))
+                                                        }
+                                                    </RadioGroup>
+                                                </FormControl>
+                                            </div>
                                         }
+                                        
+                                        
                                         <div className={classes.actionsContainer}>
                                             <div>
                                                 <Button
