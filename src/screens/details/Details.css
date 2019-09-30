@@ -1,11 +1,13 @@
 
-
+/* Style for the container containing details of the restaurant */
 .restaurant-details-container{
     display: flex;
     align-items: center;
     padding: 25px;
     background-color: rgb(231, 231, 231)
 }
+
+/* Responsive code for the smaller screen size */
 @media screen and (max-width:600px){
     .restaurant-details-container{
         flex-direction: column;
@@ -27,10 +29,13 @@
 
 }
 
+/* Style for the container containing rating adn cost   */
 .restaurant-rating-cost-container{
     display: flex;
     align-items: center;
 }
+
+/* Responsive code for the smaller screen size */
 @media screen and (min-width:600px){
     .restaurant-details{
         margin-left: 75px;
@@ -38,77 +43,96 @@
     }
 }
 
+/* Style for the restaurant rating */
 .restaurant-rating{
     display: flex;
     align-items: baseline;
 
 }
 
+/* Style for restaurant avg cost */
 .restaurant-avg-cost{
     display: flex;
     align-items: baseline;
     
 }
+/* Style for the container containing restaurant rating and the text */
 .restaurant-rating-container{
     display: flex;
     flex-direction: column;
 }
+/* Responsive code for the smaller screen size */
 @media screen and (min-width:600px){
-.restaurant-avg-cost-container{
-    display: flex;
-    flex-direction: column;
-    margin-left: 350px;
+    .restaurant-avg-cost-container{
+        display: flex;
+        flex-direction: column;
+     margin-left: 350px;
+    }
 }
-}
+
+/* Style for the No in the text of no of customer rated */
 .restaurant-NoOfCustomerRated{
     font-weight: bold;
 }
 
+
+/* Style for the Item price in the menu listing  */
 .item-price{
     display:flex;
     align-items: baseline;
     margin-left: auto;
 }
 
+/* style for the item price in the cart  */
 #cart-item-price{
     color: grey;
 }
 
+/* Style for the minus button in the cart card  */
 #minus-button{
     margin-left:auto;
 }
 
+/* Style for the item name in the cart CardContent */
 #cart-menu-item-name{
     width:150px;
     margin-left: 40px;
     color: grey;
 }
 
+/* Style for the menu item container  */
 .menu-item-container{
     display: flex;
     align-items: center;
 }
 
+/* Style for the menu item in the cart */
 .cart-menu-item-container{
     display: flex;
     align-items: center;
 
 }
 
+/* Style for the total price for the item   */
 .total-price{
     display:flex;
     align-items: baseline;
 }
 
+
+/* Style for the total amount container */
 .total-amount-container{
     display: flex;
     align-items: baseline;
     justify-content: space-between;
 }
+
+/* Style for the Total amount of the cart  */
 #cart-total-price{
     font-weight: bold;
 }
 
+/* Style for the container containing the menu listing and cart Card */
 .menu-details-cart-container{
     display: flex;
     padding: 30px;
@@ -117,6 +141,7 @@
     justify-content: space-between;
 }
 
+/* Responsive code for the smaller screen */
 @media screen and (min-width:600px){
     .menu-details{
      width:45%;
@@ -127,6 +152,7 @@
     }
 }
 
+/* Responsive code for the samll Screen */
 @media screen and (max-width:600px){
     .menu-details-cart-container{
        flex-direction: column;
@@ -141,4 +167,10 @@
         width: 100%;
         padding-top: 30px;
     }
+}
+
+.quantity-container{
+    display: flex;
+    align-items: center;
+    margin-left: auto;
 }
