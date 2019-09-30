@@ -18,6 +18,7 @@ import Fade from '@material-ui/core/Fade';
 
 import './Header.css';
 import { FormControl, InputLabel, FormHelperText } from '@material-ui/core';
+import { tsNonNullExpression } from '@babel/types';
 
 const styles = (theme => ({
     searchText: {
@@ -37,7 +38,13 @@ const styles = (theme => ({
     },
     formControl: {
         "width": "80%",
+    },
+    profileButton:{
+        color:"#c2c2c2",
+        "text-transform":"none",
+        "font-weight": 400,
     }
+
 
 }))
 const customStyles = {
@@ -73,16 +80,17 @@ class Header extends Component {
             loginContactNoRequired: "dispNone",
             loginPassword: "",
             loginPasswordRequired: "dispNone",
-            firstName: "",
+            firstName: "bharath",
             firstNameRequired: "dispNone",
             lastName: "",
             email: "",
             emailRequired: "dispNone",
+            invalidEmail:"dispNone",
             signUpPassword: "",
             signUpPasswordRequired: "dispNone",
             signUpContactNo: "",
             signUpContactNoRequired: "dispNone",
-            inValidContact: "dispNone",
+            inValidLoginContact: "dispNone",
             invalidPassword: "dispNone",
             notRegisteredContact: "dispNone",
             validPasswordHelpText: "dispNone",
@@ -119,11 +127,12 @@ class Header extends Component {
             lastName: "",
             email: "",
             emailRequired: "dispNone",
+            invalidEmail:"dispNone",
             signUpPassword: "",
             signUpPasswordRequired: "dispNone",
             signUpContactNo: "",
             signUpContactNoRequired: "dispNone",
-            inValidContact: "dispNone",
+            inValidLoginContact: "dispNone",
             invalidPassword: "dispNone",
             notRegisteredContact: "dispNone",
             validPasswordHelpText: "dispNone",
@@ -198,11 +207,13 @@ class Header extends Component {
             xhrLogin.addEventListener("readystatechange", function () {
                 if (this.readyState === 4) {
                     if (xhrLogin.status === 200) {
+                        let loginResponse = JSON.parse(this.responseText);
                         sessionStorage.setItem("uuid", JSON.parse(this.responseText).id);
                         sessionStorage.setItem("access-token", xhrLogin.getResponseHeader("access-token"));
                         that.setState({
                             ...that.state,
-                            loggedIn:true,
+                            loggedIn: true,
+                            firstName:loginResponse.first_name,
                             snackBarMessage: "Logged in successfully!",
                             snackBarOpen: true,
                         })
@@ -211,16 +222,16 @@ class Header extends Component {
                         let loginResponse = JSON.parse(this.responseText);
                         let notRegisteredContact = "dispNone"
                         let invalidPassword = "dispNone"
-                        if(loginResponse.code === 'ATH-001'){
+                        if (loginResponse.code === 'ATH-001') {
                             notRegisteredContact = "dispBlock"
                         }
-                        if(loginResponse.code === 'ATH-002'){
+                        if (loginResponse.code === 'ATH-002') {
                             invalidPassword = "dispBlock"
                         }
                         that.setState({
                             ...that.state,
-                            notRegisteredContact:notRegisteredContact,
-                            invalidPassword:invalidPassword,
+                            notRegisteredContact: notRegisteredContact,
+                            invalidPassword: invalidPassword,
                         })
                     }
                 }
@@ -237,7 +248,7 @@ class Header extends Component {
     handleLoginFormValidation = () => {
         let loginContactNoRequired = "dispNone";
         let loginPasswordRequired = "dispNone";
-        let inValidContact = "dispNone";
+        let inValidLoginContact = "dispNone";
         let isFormValid = true;
         if (this.state.loginContactNo === "") {
             loginContactNoRequired = "dispBlock";
@@ -249,28 +260,152 @@ class Header extends Component {
         }
         if (this.state.loginContactNo !== "") {
             var contactNo = "[7-9][0-9]{9}";
-            if(!this.state.loginContactNo.match(contactNo)){
-            inValidContact = "dispBlock"
-            isFormValid = false;
+            if (!this.state.loginContactNo.match(contactNo)) {
+                inValidLoginContact = "dispBlock"
+                isFormValid = false;
             }
         }
         this.setState({
-            loginContactNoRequired:loginContactNoRequired,
-            loginPasswordRequired:loginPasswordRequired,
-            inValidContact:inValidContact
+            loginContactNoRequired: loginContactNoRequired,
+            loginPasswordRequired: loginPasswordRequired,
+            inValidLoginContact: inValidLoginContact
         })
-        return(isFormValid);
+        return (isFormValid);
     }
 
-        signUpClickHandler = () => {
+    signUpClickHandler = () => {
+        if (this.signUpFormValidation()) {
+            let dataSignUp = JSON.stringify({
+                "contact_number": this.state.signUpContactNo,
+                "email_address": this.state.email,
+                "first_name": this.state.firstName,
+                "last_name": this.state.lastName,
+                "password": this.state.signUpPassword
+            });
 
+            let xhrSignUp = new XMLHttpRequest();
+            let that = this;
+            xhrSignUp.addEventListener("readystatechange", function () {
+                if (this.readyState === 4) {
+                    if (xhrSignUp.status === 201) {
+                        that.setState({
+                            ...that.state,
+                            value: 0,
+                            snackBarMessage: "Registered successfully! Please login now!",
+                            snackBarOpen: true,
+                        })
+                    }
+                    if(xhrSignUp.status === 400){
+                        let responseData = JSON.parse(this.responseText)
+                        if(responseData.code === 'SGR-001'){
+                            that.setState({
+                                ...that.state,
+                                contactNoRegistered:"dispBlock"
+                            })
+                        }
+                    }
+                }
+            });
+            xhrSignUp.open("POST",this.props.baseUrl+"customer/signup");
+            xhrSignUp.setRequestHeader("Content-Type","application/json");
+            xhrSignUp.setRequestHeader("Cache-Control","no-cache");
+            xhrSignUp.send(dataSignUp);
+        }
+    }
+
+        signUpFormValidation = () => {
+            let firstNameRequired = "dispNone";
+            let emailRequired = "dispNone";
+            let signUpPasswordRequired = "dispNone";
+            let signUpContactNoRequired = "dispNone";
+            let validPasswordHelpText = "dispNone";
+            let contactHelpText = "dispNone";
+            let invalidEmail = "dispNone";
+            let signUpFormValid = true;
+
+            if (this.state.firstName === "") {
+                firstNameRequired = "dispBlock";
+                signUpFormValid = false;
+            }
+            if (this.state.email === "") {
+                emailRequired = "dispBlock";
+                signUpFormValid = false;
+            }
+            if (this.state.email !== "") {
+  
+                if (!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w+)+$/.test(this.state.email))) {
+                    invalidEmail = "dispBlock"
+                    signUpFormValid = false;
+                }
+            }
+            if (this.state.signUpContactNo === "") {
+                signUpContactNoRequired = "dispBlock";
+                signUpFormValid = false;
+            }
+            if (this.state.signUpContactNo !== "") {
+                var contactNo = "[7-9][0-9]{9}";
+                if (!this.state.signUpContactNo.match(contactNo)) {
+                    contactHelpText = "dispBlock"
+                    signUpFormValid = false;
+                }
+            }
+            if (this.state.signUpPassword === "") {
+                signUpPasswordRequired = "dispBlock";
+                signUpFormValid = false;
+            }
+            if (this.state.signUpPassword !== "") {
+                if (!this.isValidPassword(this.state.signUpPassword)) {
+                    validPasswordHelpText = "dispBlock"
+                    signUpFormValid = false;
+
+                }
+            }
             this.setState({
-                ...this.state,
-                value: 0,
-                snackBarMessage: "Registered successfully! Please login now!",
-                snackBarOpen: true,
+                firstNameRequired: firstNameRequired,
+                emailRequired: emailRequired,
+                contactHelpText:contactHelpText,
+                signUpPasswordRequired: signUpPasswordRequired,
+                signUpContactNoRequired: signUpContactNoRequired,
+                invalidEmail:invalidEmail,
+                validPasswordHelpText: validPasswordHelpText,
             })
+            return (signUpFormValid);
 
+        }
+
+        isValidPassword = (password) => {
+            let lowerCase = false;
+            let upperCase = false;
+            let number = false;
+            let specialCharacter = false;
+
+
+            if (password.length < 8) {
+                return false;
+            }
+
+            if (password.match("(?=.*[0-9]).*")) {
+                number = true;
+            }
+
+            if (password.match("(?=.*[a-z]).*")) {
+                lowerCase = true;
+            }
+            if (password.match("(?=.*[A-Z]).*")) {
+                upperCase = true;
+            }
+            if (password.match("(?=.*[#@$%&*!^]).*")) {
+                specialCharacter = true;
+            }
+
+            if (lowerCase && upperCase) {
+                if (specialCharacter && number) {
+                    return true;
+                }
+            } else {
+                return false;
+            }
+            return false;
         }
 
         snackBarClose = (event, reason) => {
@@ -288,7 +423,6 @@ class Header extends Component {
             const { classes } = this.props;
             return (
                 <div>
-                    {/* {this.state.loggedIn === false && this.state.loginCredentialsCorrect === true ? this.callLoginAPI():""}  */}
                     <header className="app-header">
                         <FastfoodIcon className="app-logo" fontSize="large" htmlColor="white" />
                         <span className="header-searchbox">
@@ -300,10 +434,16 @@ class Header extends Component {
                                 }
                                 fullWidth={true} placeholder="Search by Restaurant Name" />
                         </span>
+                        {this.state.loggedIn !== true ?
                         <Button className={classes.loginButton} size="large" variant="contained" onClick={this.loginButtonClickHandler}>
                             <AccountCircle className="login-button-icon" />
                             LOGIN
-                </Button>
+                        </Button>
+                        :<Button className={classes.profileButton} size="large" variant="text" onClick={this.profileButtonClickHandler}>
+                            <AccountCircle className="profile-button-icon" htmlColor="#c2c2c2"/>
+                            {this.state.firstName}
+                        </Button>
+                        }
                     </header>
                     <Modal
                         ariaHideApp={false}
@@ -325,7 +465,7 @@ class Header extends Component {
                                     <FormHelperText className={this.state.loginContactNoRequired}>
                                         <span className='red'>required</span>
                                     </FormHelperText>
-                                    <FormHelperText className={this.state.inValidContact}>
+                                    <FormHelperText className={this.state.inValidLoginContact}>
                                         <span className="red">Invalid Contact</span>
                                     </FormHelperText>
 
@@ -373,6 +513,9 @@ class Header extends Component {
                                     <Input id="email" className="input-fields" type="email" email={this.state.email} fullWidth={true} onChange={this.inputEmailChangeHandler} value={this.state.email} />
                                     <FormHelperText className={this.state.emailRequired}>
                                         <span className="red">required</span>
+                                    </FormHelperText>
+                                    <FormHelperText className={this.state.invalidEmail}>
+                                        <span className="red">Invalid Email</span>
                                     </FormHelperText>
                                 </FormControl>
                                 <br />
