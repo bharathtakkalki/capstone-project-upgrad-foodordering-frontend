@@ -141,7 +141,7 @@ class Home extends Component {
         return (
             <div>
 
-                <Header baseUrl={this.props.baseUrl}></Header>
+                <Header baseUrl={this.props.baseUrl} showHeaderSearchBox={true}></Header>
                 <div className="flex-container">
                     <Grid container spacing={3} wrap="wrap" alignContent="center" className={classes.grid}>
                         {this.state.restaurant.map(restaurant => (
