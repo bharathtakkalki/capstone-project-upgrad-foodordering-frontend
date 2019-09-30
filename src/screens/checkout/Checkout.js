@@ -102,8 +102,7 @@ class Checkout extends Component {
             pincodeHelpText: "dispNone",
             states: [],
             selectedPayment:"",
-            selectedPaymentId:"",
-            payment:['COD','Online Payment']
+            payment:[],
 
 
         }
@@ -170,8 +169,23 @@ class Checkout extends Component {
             }
         })
 
-        xhrStates.open('GET', this.props.baseUrl + 'states')
+        xhrStates.open('GET', this.props.baseUrl + 'states');
         xhrStates.send(statesData);
+
+        let paymentData = null;
+        let xhrPayment = new XMLHttpRequest();
+        xhrPayment.addEventListener("readystatechange",function(){
+            if (xhrPayment.readyState === 4 && xhrPayment.status === 200){
+                let payment = JSON.parse(xhrPayment.responseText).paymentMethods;
+                that.setState({
+                    ...that.state,
+                    payment:payment,
+                })
+            }
+        })
+
+        xhrPayment.open('GET',this.props.baseUrl+'payment');
+        xhrPayment.send(paymentData);
     }
 
     getAllAddress = () => {
@@ -447,8 +461,8 @@ class Checkout extends Component {
                                                         Select Mode of Payment
                                                     </FormLabel>
                                                     <RadioGroup aria-label="payment" name="payment" value={this.state.selectedPayment} onChange = {this.radioChangeHandler}>
-                                                        {this.state.payment.map((label,index) => (
-                                                            <FormControlLabel value={label} control={<Radio/>} label={label} />
+                                                        {this.state.payment.map(payment => (
+                                                            <FormControlLabel key={payment.id} value={payment.id} control={<Radio/>} label={payment.payment_name} />
                                                         ))
                                                         }
                                                     </RadioGroup>
@@ -462,7 +476,7 @@ class Checkout extends Component {
                                                 <Button
                                                     disabled={this.state.activeStep === 0}
                                                     onClick={this.backButtonClickHandler}
-                                                    className={classes.Button}
+                                                    className={classes.button}
                                                 >
                                                     Back
                                                 </Button>
