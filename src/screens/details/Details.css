@@ -79,6 +79,7 @@
 }
 
 #cart-menu-item-name{
+    width:150px;
     margin-left: 40px;
     color: grey;
 }
@@ -138,5 +139,6 @@
     }
     .my-cart{
         width: 100%;
+        padding-top: 30px;
     }
 }
