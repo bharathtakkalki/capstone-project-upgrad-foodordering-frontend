@@ -4,6 +4,9 @@ import SearchIcon from '@material-ui/icons/Search';
 import Input from '@material-ui/core/Input';
 import{withStyles} from '@material-ui/core/styles';
 import InputAdornment from '@material-ui/core/InputAdornment';
+import Button from '@material-ui/core/Button';
+import AccountCircle from '@material-ui/icons/AccountCircle';
+
 
 import './Header.css';
 
@@ -13,7 +16,10 @@ const styles = (theme => ({
         '&:after':{
             borderBottom:'2px solid white',
         }
-    }
+    },
+    loginButton:{
+        "font-weight": 400,
+    },
 
 }))
 
@@ -37,6 +43,10 @@ class Header extends Component{
                             }
                             fullWidth= {true} placeholder="Search by Restaurant Name"  />
                 </span>
+                <Button className={classes.loginButton} size="large" variant="contained">
+                    <AccountCircle className ="login-button-icon"/>
+                    LOGIN
+                </Button>
 
 
             </header>

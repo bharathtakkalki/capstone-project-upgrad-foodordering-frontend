@@ -2,8 +2,10 @@
     display: flex;
     height: 40px;
     background-color:rgb(37, 50,56);
-    padding-left: 10px;
-    padding: 10px;
+    padding-left: 20px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    padding-top: 10px;
     align-items: center;
 }
 
@@ -20,4 +22,8 @@
 #search-icon{
     height: 27px;
     padding: 0px 0px 0px 10px;
+}
+
+.login-button-icon{
+    padding-right: 10px;
 }
