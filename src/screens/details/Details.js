@@ -280,7 +280,7 @@ class Details extends Component {
             })
         }else{ //If all the condition are satisfied user pushed to the checkout screen
             this.props.history.push({
-                pathname: '/checkout/',
+                pathname: '/checkout',
                 cartItems: this.state.cartItems,
                 restaurantDetails: this.state.restaurantDetails,
             })
