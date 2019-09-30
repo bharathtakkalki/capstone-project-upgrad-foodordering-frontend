@@ -15,6 +15,7 @@ import '@fortawesome/fontawesome-svg-core';
 
 import './Home.css';
 
+// Custom Styles to over ride material ui default styles
 const styles = (theme => ({
     root: {
         flexGrow: 1,
@@ -28,27 +29,28 @@ const styles = (theme => ({
         transform: 'translateZ(0)',
         cursor: 'pointer',
     },
+    gridCard:{ //Style for the Grid card 
+        '@media (min-width: 1200px)':{ //Making the code responsive to different screens
 
-    gridCard: {
-        '@media (min-width: 1200px)': {
             'flex-grow': '0',
             'max-width': '25%',
             'flex-basis': '25%',
         },
-        '@media (min-width: 960px) and (max-width:1200px)': {
+
+        '@media (min-width: 960px) and (max-width:1200px)':{ //Making the code responsive to different screens 
             'flex-grow': '0',
             'max-width': '33%',
             'flex-basis': '33%',
         },
     },
 
-    card: {
-        height: "500px",
-        '@media (min-width: 1300px)': {
-            height: "500px",
+    card:{ //Style for the card and responsive code for different screen size
+        height:"500px",
+        '@media (min-width: 1300px)':{ //Making the code responsive to different screens 
+            height:"500px",
         },
-        '@media (min-width: 960px) and (max-width:1300px)': {
-            height: "375px",
+        '@media (min-width: 960px) and (max-width:1300px)':{ //Making the code responsive to different screens 
+            height:"375px",
         }
     },
 
@@ -57,11 +59,10 @@ const styles = (theme => ({
         width: "100%",
         // paddingTop: '56.25%', // 16:9
     },
-
-    title: {
-        "font-size": "25px",
-        '@media (min-width: 1300px)': {
-            "font-size": "40px",
+    title:{ //Style for the Title in the Card 
+        "font-size":"25px",
+        '@media (min-width: 1300px)':{
+            "font-size":"40px",
         },
         '@media (min-width: 960px) and (max-width:1300px)': {
             "font-size": "30px",
@@ -70,11 +71,10 @@ const styles = (theme => ({
             "font-size": "40px",
         }
     },
-
-    categories: {
-        "font-size": "16px",
-        '@media (min-width: 1300px)': {
-            "font-size": "22px",
+    categories:{ //Style for the categories in the card
+        "font-size":"16px",
+        '@media (min-width: 1300px)':{
+            "font-size":"22px",
         },
         '@media (min-width: 960px) and (max-width:1300px)': {
             "font-size": "20px",
@@ -84,15 +84,16 @@ const styles = (theme => ({
         }
     },
 
-    cardContent: {
-        "padding": "10px",
-        "margin-left": "20px",
-        "margin-right": "20px",
-        "height": "20%",
-        "display": "flex",
-        "align-items": "center",
-    },
-    cardActionArea: {
+
+    cardContent:{ // Styles for the card content
+        "padding":"10px",
+        "margin-left":"20px",
+        "margin-right":"20px",
+        "height":"20%",
+        "display":"flex",
+        "align-items":"center",
+    }, 
+    cardActionArea:{ //Style for the Card action area button
         "display": "flex",
         "height": "100%",
         "flex-direction": "column",
@@ -101,11 +102,9 @@ const styles = (theme => ({
 
     }
 
-
-
 }))
 
-
+// Creating Home class component to render the home page as per the design
 class Home extends Component {
     constructor() {
         super()
@@ -115,12 +114,15 @@ class Home extends Component {
         }
     }
 
-    componentDidMount() {
+    //This Method is called when the components are mounted.
+    //This method inturn calls the api to get all the restaurants in the data base and then sets the state of the restaurant
+    //Re-renders the page with the updated restaurant details. 
+    componentDidMount(){
         let data = null;
         let xhrRestaurant = new XMLHttpRequest();
         let that = this;
-        xhrRestaurant.addEventListener("readystatechange", function () {
-            if (xhrRestaurant.readyState === 4 && xhrRestaurant.status === 200) {
+        xhrRestaurant.addEventListener("readystatechange",function(){
+            if(xhrRestaurant.readyState === 4 && xhrRestaurant.status === 200){ 
                 let restaurant = JSON.parse(xhrRestaurant.responseText)
                 console.log(restaurant.restaurants)
                 that.setState({
@@ -128,7 +130,7 @@ class Home extends Component {
                 });
             }
         })
-        xhrRestaurant.open("GET", this.props.baseUrl + "restaurant")
+        xhrRestaurant.open("GET",this.props.baseUrl+"restaurant") // Getting all data from the restaurant endpoint.
         xhrRestaurant.send(data)
     }
 
@@ -158,62 +160,67 @@ class Home extends Component {
     }
 
 
+    //This Method Handles the click on the restaurant card.
+    //It takes the restaurant id as the Parameter and then pushes the restaurantDetails page 
     restaurantCardClicked = (restaurantId) => {
         this.props.history.push('/restaurant/' + restaurantId);
     }
 
     render() {
+         // Styles are stored in the const classes
         const { classes } = this.props;
         return (
             <div>
-
-                <Header baseUrl={this.props.baseUrl} showHeaderSearchBox={true} updateSearchRestaurant={this.updateSearchRestaurant}></Header>
+                {/* Rendering the Header Component */}
+                <Header baseUrl={this.props.baseUrl} showHeaderSearchBox={true}></Header> 
                 <div className="flex-container">
                     <Grid container spacing={3} wrap="wrap" alignContent="center" className={classes.grid}>
-                        {this.state.restaurant !== null ? this.state.restaurant.map(restaurant => (
-                            <Grid key={restaurant.id} item xs={12} sm={6} md={3} className={classes.gridCard}>
-                                <Card className={classes.card}>
-                                    <CardActionArea className={classes.cardActionArea} onClick={() => this.restaurantCardClicked(restaurant.id)}>
-                                        <CardMedia
-                                            className={classes.media}
-                                            image={restaurant.photo_URL}
-                                            title={restaurant.restaurant_name}
-                                        />
-                                        <CardContent className={classes.cardContent}>
-                                            <Typography className={classes.title} variant="h5" component="h2">
-                                                {restaurant.restaurant_name}
-                                            </Typography>
-                                        </CardContent>
-                                        <CardContent className={classes.cardContent}>
-                                            <Typography variant="subtitle1" component="p" className={classes.categories}>
-                                                {restaurant.categories}
-                                            </Typography>
-                                        </CardContent>
-                                        <CardContent className={classes.cardContent}>
-                                            <div className="card-bottom-info">
-                                                <span className="rest-rating">
-                                                    <span>
-                                                        <FontAwesomeIcon icon="star" size="lg" color="white" />
-                                                    </span>
-                                                    <Typography variant="caption" component="p" >{restaurant.customer_rating}</Typography>
-                                                    <Typography variant="caption" component="p" >({restaurant.number_customers_rated})</Typography>
-                                                </span>
-                                                <span className="rest-for-two">
-                                                    <Typography variant="caption" component="p">
-                                                        <FontAwesomeIcon icon="rupee-sign" />
-                                                        {restaurant.average_price}
-                                                    </Typography>
-                                                    <Typography variant="caption" component="p">for two</Typography>
-                                                </span>
-                                            </div>
-                                        </CardContent>
-                                    </CardActionArea>
-                                </Card>
-                            </Grid>
-                            ))
-                            : <Typography variant="body1" component="p">No restaurant with given name.</Typography>
-                        }
-                    </Grid>
+                        {/* Restaurant array map method is called and for each item in the array a card is rendered with the details. */}
+                        {this.state.restaurant.map(restaurant => (
+                        //Grid Used to create columns as per the screen size
+                        //Card used to show the restaurant details.
+                        <Grid key={restaurant.id} item xs={12} sm={6} md={3} className={classes.gridCard}>
+                            <Card className={classes.card}>
+                                <CardActionArea className={classes.cardActionArea} onClick={() => this.restaurantCardClicked(restaurant.id)}>
+                                    <CardMedia
+                                        className={classes.media}
+                                        image={restaurant.photo_URL}
+                                        title={restaurant.restaurant_name}
+                                    />
+                                    <CardContent className = {classes.cardContent}>
+                                        <Typography className={classes.title} variant="h5" component="h2">
+                                            {restaurant.restaurant_name}
+                                         </Typography>
+                                    </CardContent>
+                                    <CardContent className = {classes.cardContent}>
+                                        <Typography variant="subtitle1" component="p" className = {classes.categories}>
+                                            {restaurant.categories}
+                                         </Typography>
+                                    </CardContent>
+                                    <CardContent className = {classes.cardContent}>
+                                         <div className="card-bottom-info">
+                                             <span className="rest-rating">
+                                             <span>
+                                                <FontAwesomeIcon icon="star" size="lg" color="white"/>
+                                             </span>
+                                             <Typography variant="caption" component="p" >{restaurant.customer_rating}</Typography>
+                                             <Typography variant="caption" component="p" >({restaurant.number_customers_rated})</Typography>
+                                            </span>
+                                            <span className="rest-for-two"> 
+                                                <Typography variant="caption" component="p">
+                                                    <FontAwesomeIcon icon="rupee-sign" />
+                                                    {restaurant.average_price}
+                                                </Typography>
+                                                <Typography variant="caption" component="p">for two</Typography>
+                                            </span>
+                                         </div>
+                                    </CardContent>
+                                </CardActionArea>
+                            </Card>
+                        </Grid>
+                        ))}
+                        </Grid>
+                    </div>
                 </div>
             </div>
         )
