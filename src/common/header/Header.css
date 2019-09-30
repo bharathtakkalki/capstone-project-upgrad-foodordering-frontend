@@ -2,11 +2,25 @@
     display: flex;
     height: 40px;
     background-color:rgb(37, 50,56);
-    padding-left: 20px;
-    padding-right: 10px;
-    padding-bottom: 10px;
-    padding-top: 10px;
+    padding: 10px;
     align-items: center;
+    justify-content: space-between;
+}
+
+.app-logo{
+    padding-left: 10px;
+    align-self: center;
+}
+@media screen and (max-width:600px){
+    .app-header{
+        flex-direction: column;
+        height: 140px;
+        align-items: flex-start;
+        justify-content:space-between;
+    }
+    .app-logo{
+        align-self:flex-start;
+    }
 }
 
 .header-searchbox{
@@ -26,4 +40,23 @@
 
 .login-button-icon{
     padding-right: 10px;
+}
+
+.login-modal-tabs {
+    margin-bottom: 20px;
+}
+
+.dispNone {
+    display: none;
+}
+
+.dispBlock {
+    display: block;
+}
+
+.input-fields{
+    width:250px;
+}
+.red {
+    color: red;
 }
