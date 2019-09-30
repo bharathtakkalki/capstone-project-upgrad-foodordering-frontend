@@ -482,6 +482,7 @@ class Header extends Component {
             <div>
                 <header className="app-header">
                     <FastfoodIcon className="app-logo" fontSize="large" htmlColor="white" />
+                    {this.props.showHeaderSearchBox === true && 
                     <span className="header-searchbox">
                         <Input className={classes.searchText}
                             startAdornment={
@@ -491,7 +492,11 @@ class Header extends Component {
                             }
                             fullWidth={true} placeholder="Search by Restaurant Name" />
                     </span>
+
+                    }
+
                     {/* Checks for loggedIn if not then displays the login button else profile button */}
+
                     {this.state.loggedIn !== true ?
                         <Button className={classes.loginButton} size="large" variant="contained" onClick={this.loginButtonClickHandler}>
                             <AccountCircle className="login-button-icon" />
