@@ -358,7 +358,7 @@ class Header extends Component {
         }
         if (this.state.email !== "") {
 
-            if (!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w+)+$/.test(this.state.email))) {
+            if (!(/^\w+([-]?\w+)*@\w+([-]?\w+)*(\.\w+)+$/.test(this.state.email))) {
                 invalidEmail = "dispBlock"
                 signUpFormValid = false;
             }
