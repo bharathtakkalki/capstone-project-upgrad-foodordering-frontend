@@ -1,11 +1,12 @@
 /* style for the div containing the grid  */
-.flex-container{
+.flex-container{ 
     width: 100%;
     display: flex;
     flex-direction: column;
     flex-flow: wrap;
 }
 
+/* Style for the Restaurant rating  */
 .rest-rating{
     background-color: rgb(234, 204, 94);
     width: 100px;
@@ -16,6 +17,8 @@
     color: white;
  
 }
+
+/* Style for the Restaurant card bottom info */
 .card-bottom-info{
     display: flex;
     justify-content: space-between;
@@ -24,6 +27,7 @@
     width: 100%;
 }
 
+/* Style for the cost for two element  */
 .rest-for-two{
     display: flex;
     align-items: center;
@@ -31,10 +35,12 @@
     justify-content: space-around;
 }
 
+/* Style for the title */
 .title{
     font-size:30px;
 }
 
+/* style for the card action area */
 .card-action-area{
     display: flex;
     height: 100%;
